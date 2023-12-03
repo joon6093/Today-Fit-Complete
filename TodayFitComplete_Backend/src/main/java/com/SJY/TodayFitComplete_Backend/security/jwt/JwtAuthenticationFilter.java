@@ -57,7 +57,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 log.error("JWT 토큰을 가져오는 데 실패하였습니다.", e);
             }
         } else {
-            log.info("JWT 토큰이 Bearer로 시작하지 않습니다.");
+            log.info("요청 헤더에 JWT Bearer 토큰이 없습니다.");
         }
 
         // 사용자 인증 처리
@@ -74,7 +74,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 log.info("유효하지 않은 JWT 토큰입니다.");
             }
         } else {
-            log.info("사용자 이름이 null이거나 이미 인증된 상태입니다.");
+            log.info("인증 정보가 없거나 이미 인증된 요청입니다.");
         }
 
         filterChain.doFilter(request, response); // 요청을 다음 필터로 전달
