@@ -8,8 +8,8 @@ dev-db:
   password: 2721
 
   prod-db:
-    host: svc.sel5.cloudtype.app
-    port: 32498
+    host: mariadb
+    port: 3306
     name: TodayFitComplete
     username: root
     password: 2721
