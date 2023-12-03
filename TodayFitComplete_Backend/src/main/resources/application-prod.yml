@@ -2,6 +2,9 @@ server:
   port: 8080
 
 spring:
+  config:
+    import: classpath:application-db.yml
+
   datasource:
     url: jdbc:mariadb://${prod-db.host}:${prod-db.port}/${prod-db.name}?allowPublicKeyRetrieval=true&useSSL=false&useUnicode=true&characterEncoding=utf8
     username: ${prod-db.username}
