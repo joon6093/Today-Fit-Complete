@@ -7,9 +7,9 @@ dev-db:
   username: root
   password: 2721
 
-  prod-db:
-    host: mariadb
-    port: 3306
-    name: TodayFitComplete
-    username: root
-    password: 2721
+prod-db:
+  host: mariadb
+  port: 3306
+  name: TodayFitComplete
+  username: root
+  password: 2721
