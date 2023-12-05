@@ -86,7 +86,7 @@ public class MemberService {
         checkPassword(updateDto.getPassword(), updateDto.getPasswordCheck());
         String encodePwd = pwdEncoder.encode(updateDto.getPassword());
         Member updateMember =  memberRepository.findByEmail(member.getEmail()).orElseThrow(
-                () -> new ResourceNotFoundException("Member", "Member Email", member.getEmail())
+                () -> new ResourceNotFoundException("Member", "Email", member.getEmail())
         );
         updateMember.update(encodePwd, updateDto.getUsername());
         return MemberResponse.fromEntity(updateMember);
@@ -99,18 +99,18 @@ public class MemberService {
         try {
             authManager.authenticate(new UsernamePasswordAuthenticationToken(email, pwd));
         } catch (DisabledException e) {
-            throw new MemberException("인증되지 않은 아이디입니다.", HttpStatus.BAD_REQUEST);
+            throw new MemberException("User is disabled.", HttpStatus.BAD_REQUEST);
         } catch (BadCredentialsException e) {
-            throw new MemberException("비밀번호가 일치하지 않습니다. : authenticate", HttpStatus.BAD_REQUEST);
+            throw new MemberException("Invalid credentials.", HttpStatus.BAD_REQUEST);
         }
     }
 
     /**
-     * 아이디 중복 체크
+     * 이메일 중복 체크
      */
     private void isExistUserEmail(String email) {
         if (memberRepository.findByEmail(email).isPresent()) {
-            throw new MemberException("이미 사용 중인 이메일입니다.", HttpStatus.BAD_REQUEST);
+            throw new MemberException("Email is already in use.", HttpStatus.BAD_REQUEST);
         }
     }
 
@@ -119,7 +119,7 @@ public class MemberService {
      */
     private void checkPassword(String password, String passwordCheck) {
         if (!password.equals(passwordCheck)) {
-            throw new MemberException("비밀번호/비밀번호 확인이 서로 일치하지 않습니다.", HttpStatus.BAD_REQUEST);
+            throw new MemberException("Password and password confirmation do not match.", HttpStatus.BAD_REQUEST);
         }
     }
 
@@ -128,7 +128,7 @@ public class MemberService {
      */
     private void checkEncodePassword(String rawPassword, String encodedPassword) {
         if (!pwdEncoder.matches(rawPassword, encodedPassword)) {
-            throw new MemberException("비밀번호가 일치하지 않습니다. : checkEncodePassword", HttpStatus.BAD_REQUEST);
+            throw new MemberException("Incorrect password.", HttpStatus.BAD_REQUEST);
         }
     }
 }
