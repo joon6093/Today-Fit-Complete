@@ -15,7 +15,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
-import kr.ac.kumoh.ce.s20190633.todayfitcomplete_frontend.ViewModel.Member.MemberViewModel
+import kr.ac.kumoh.ce.s20190633.todayfitcomplete_frontend.ViewModel.MemberViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

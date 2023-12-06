@@ -1,5 +1,6 @@
-package kr.ac.kumoh.ce.s20190633.todayfitcomplete_frontend.ViewModel.Member
+package kr.ac.kumoh.ce.s20190633.todayfitcomplete_frontend.ViewModel
 
+import android.app.Application
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -11,12 +12,13 @@ import kotlinx.coroutines.withContext
 import kr.ac.kumoh.ce.s20190633.todayfitcomplete_frontend.ApiService.MemberApiService
 import kr.ac.kumoh.ce.s20190633.todayfitcomplete_frontend.Dto.Member.MemberLoginDto
 import kr.ac.kumoh.ce.s20190633.todayfitcomplete_frontend.Dto.Member.MemberRegisterDto
+import kr.ac.kumoh.ce.s20190633.todayfitcomplete_frontend.SharedPreferencesUtils
 import retrofit2.Call
 import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
-class MemberViewModel : ViewModel() {
+class MemberViewModel(private val application: Application) : ViewModel() {
     private val SERVER_URL = "https://port-0-todayfitcomplete-1drvf2llomgqfda.sel5.cloudtype.app"
     private val memberApiService: MemberApiService
 
@@ -73,7 +75,6 @@ class MemberViewModel : ViewModel() {
 
     private val _isLoggedIn = MutableLiveData<Boolean>()
     val isLoggedIn: LiveData<Boolean> = _isLoggedIn
-
     fun login(email: String, password: String) {
         viewModelScope.launch {
             try {
@@ -81,11 +82,12 @@ class MemberViewModel : ViewModel() {
                 val response = withContext(Dispatchers.IO) {
                     memberApiService.login(memberLoginDto).execute()
                 }
-                if (response.isSuccessful) {
-                    // 로그인 성공 처리
+                if (response.isSuccessful && response.body() != null) {
+                    val token = response.body()!!.token
+                    // SharedPreferences를 사용하여 토큰 저장
+                    SharedPreferencesUtils.saveToken(application, token)
                     _isLoggedIn.postValue(true)
                 } else {
-                    // 로그인 실패 처리
                     _isLoggedIn.postValue(false)
                 }
             } catch (e: Exception) {
@@ -94,4 +96,5 @@ class MemberViewModel : ViewModel() {
             }
         }
     }
+
 }

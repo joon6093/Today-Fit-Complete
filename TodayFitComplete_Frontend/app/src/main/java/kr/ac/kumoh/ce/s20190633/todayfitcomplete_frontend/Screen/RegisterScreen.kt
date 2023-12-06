@@ -17,7 +17,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import kr.ac.kumoh.ce.s20190633.todayfitcomplete_frontend.Dto.Member.MemberRegisterDto
-import kr.ac.kumoh.ce.s20190633.todayfitcomplete_frontend.ViewModel.Member.MemberViewModel
+import kr.ac.kumoh.ce.s20190633.todayfitcomplete_frontend.ViewModel.MemberViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
