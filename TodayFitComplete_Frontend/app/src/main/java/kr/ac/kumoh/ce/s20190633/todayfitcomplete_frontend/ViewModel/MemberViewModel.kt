@@ -12,9 +12,8 @@ import kotlinx.coroutines.withContext
 import kr.ac.kumoh.ce.s20190633.todayfitcomplete_frontend.ApiService.MemberApiService
 import kr.ac.kumoh.ce.s20190633.todayfitcomplete_frontend.Dto.Member.MemberLoginDto
 import kr.ac.kumoh.ce.s20190633.todayfitcomplete_frontend.Dto.Member.MemberRegisterDto
+import kr.ac.kumoh.ce.s20190633.todayfitcomplete_frontend.NullOnEmptyConverterFactory
 import kr.ac.kumoh.ce.s20190633.todayfitcomplete_frontend.SharedPreferencesUtils
-import retrofit2.Call
-import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
@@ -25,12 +24,12 @@ class MemberViewModel(private val application: Application) : ViewModel() {
     init {
         val retrofit = Retrofit.Builder()
             .baseUrl(SERVER_URL)
+            .addConverterFactory(NullOnEmptyConverterFactory())
             .addConverterFactory(GsonConverterFactory.create())
             .build()
 
         memberApiService = retrofit.create(MemberApiService::class.java)
     }
-
     //회원가입
     private val _registrationStatus = MutableLiveData<String?>()
     val registrationStatus: LiveData<String?> = _registrationStatus
@@ -56,20 +55,20 @@ class MemberViewModel(private val application: Application) : ViewModel() {
     // 이메일 중복 검사
     fun checkEmailDuplicate(email: String, onResult: (Boolean) -> Unit) {
         viewModelScope.launch {
-            memberApiService.checkIdDuplicate(email).enqueue(object : retrofit2.Callback<Boolean> {
-                override fun onResponse(call: Call<Boolean>, response: Response<Boolean>) {
-                    if (response.isSuccessful) {
-                        onResult(response.body() ?: false)
-                    } else {
-                        onResult(false)
-                    }
+            try {
+                val response = withContext(Dispatchers.IO) {
+                    memberApiService.checkIdDuplicate(email).execute()
                 }
-
-                override fun onFailure(call: Call<Boolean>, t: Throwable) {
-                    Log.e("MemberViewModel", "Error checking email duplicate: ${t.message}")
+                if (response.isSuccessful) {
+                    onResult(true)
+                } else {
+                    Log.e("MemberViewModel", "Check email duplicate failed: ${response.errorBody()?.string()}")
                     onResult(false)
                 }
-            })
+            } catch (e: Exception) {
+                Log.e("MemberViewModel", "Error checking email duplicate: ${e.message}")
+                onResult(false)
+            }
         }
     }
 
@@ -84,8 +83,9 @@ class MemberViewModel(private val application: Application) : ViewModel() {
                 }
                 if (response.isSuccessful && response.body() != null) {
                     val token = response.body()!!.token
-                    // SharedPreferences를 사용하여 토큰 저장
+                    // SharedPreferences를 사용하여 토큰과 사용자 이메일 저장
                     SharedPreferencesUtils.saveToken(application, token)
+                    SharedPreferencesUtils.saveEmail(application, email)
                     _isLoggedIn.postValue(true)
                 } else {
                     _isLoggedIn.postValue(false)

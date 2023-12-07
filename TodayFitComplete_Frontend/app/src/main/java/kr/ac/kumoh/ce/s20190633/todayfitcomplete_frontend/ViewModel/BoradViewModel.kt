@@ -10,10 +10,10 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import kr.ac.kumoh.ce.s20190633.todayfitcomplete_frontend.Dto.Borad.BoardListResponse
 import kr.ac.kumoh.ce.s20190633.todayfitcomplete_frontend.ApiService.BoardApiService
 import kr.ac.kumoh.ce.s20190633.todayfitcomplete_frontend.ApiService.FileApiService
 import kr.ac.kumoh.ce.s20190633.todayfitcomplete_frontend.Dto.Board.BoardDetailsResponse
+import kr.ac.kumoh.ce.s20190633.todayfitcomplete_frontend.Dto.Borad.BoardListResponse
 import kr.ac.kumoh.ce.s20190633.todayfitcomplete_frontend.Dto.Borad.BoardWriteDto
 import kr.ac.kumoh.ce.s20190633.todayfitcomplete_frontend.SharedPreferencesUtils
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
@@ -31,9 +31,6 @@ class BoardViewModel(application: Application) : AndroidViewModel(application) {
     private val _boardList = MutableLiveData<List<BoardListResponse>>()
     data class FileDetail(val file: File, val mimeType: String, val fileName: String)
 
-    val boardList: LiveData<List<BoardListResponse>>
-        get() = _boardList
-
     init {
         val retrofit = Retrofit.Builder()
             .baseUrl(SERVER_URL)
@@ -45,19 +42,17 @@ class BoardViewModel(application: Application) : AndroidViewModel(application) {
         fetchBoardData()
     }
 
+    val boardList: LiveData<List<BoardListResponse>>
+        get() = _boardList
     private fun fetchBoardData() {
         viewModelScope.launch {
-            try {
-                val response = withContext(Dispatchers.IO) { // 비동기적으로 네트워크 요청 수행
-                    boardApi.getBoardList().execute()
-                }
-                if (response.isSuccessful) {
-                    _boardList.value = response.body()?.content
-                } else {
-                    Log.e("fetchBoardData()", "Response not successful")
-                }
-            } catch (e: Exception) {
-                Log.e("fetchBoardData()", e.toString())
+            val response = withContext(Dispatchers.IO) {
+                boardApi.getBoardList().execute()
+            }
+            if (response.isSuccessful) {
+                _boardList.value = response.body()?.content
+            } else {
+                Log.e("fetchBoardData()", "Response not successful")
             }
         }
     }
@@ -66,79 +61,40 @@ class BoardViewModel(application: Application) : AndroidViewModel(application) {
     val boardDetails: LiveData<BoardDetailsResponse> = _boardDetails
     fun fetchBoardDetails(boardId: Long) {
         viewModelScope.launch {
-            try {
-                val response = withContext(Dispatchers.IO) {
-                    // Retrofit을 사용한 API 호출
-                    boardApi.getBoardDetails(boardId).execute()
-                }
-                if (response.isSuccessful && response.body() != null) {
-                    _boardDetails.postValue(response.body())
-                } else {
-                    // 오류 처리: API 응답 실패
-                }
-            } catch (e: Exception) {
-                // 오류 처리: 예외 발생
+            val response = withContext(Dispatchers.IO) {
+                boardApi.getBoardDetails(boardId).execute()
+            }
+            if (response.isSuccessful && response.body() != null) {
+                _boardDetails.postValue(response.body())
             }
         }
     }
 
-    // 게시글 작성 함수
-    fun writePost(title: String, content: String) {
-        // 토큰을 가져오는 로직
-        val token = SharedPreferencesUtils.getToken(getApplication<Application>().applicationContext)
-
-        // 게시글 작성 DTO 생성
-        val boardWriteDto = BoardWriteDto(title, content)
-
-        // 게시글 작성 API 호출 로직
-        viewModelScope.launch {
-            try {
-                val response = withContext(Dispatchers.IO) {
-                    boardApi.writePost("Bearer $token", boardWriteDto).execute()
-                }
-                if (response.isSuccessful) {
-                    // 게시글 작성 성공 처리
-                } else {
-                    // 게시글 작성 실패 처리
-                }
-            } catch (e: Exception) {
-                // 예외 처리
-            }
-        }
-    }
-    // BoardViewModel 클래스 내부
-    fun writePostWithFiles(title: String, content: String, fileUris: List<Uri>) {
+    fun writePostWithFiles(title: String, content: String, fileUris: List<Uri>, onPostComplete: () -> Unit) {
         val token = SharedPreferencesUtils.getToken(getApplication<Application>().applicationContext)
         val boardWriteDto = BoardWriteDto(title, content)
 
         viewModelScope.launch {
             // 파일 정보 생성
             val fileDetails = fileUris.mapNotNull { uri ->
-                try {
-                    val fileName = getFileName(uri)
-                    val mimeType = getApplication<Application>().contentResolver.getType(uri) ?: "application/octet-stream"
-                    val file = uriToFile(uri, fileName)
-
-                    FileDetail(file, mimeType, fileName)
-                } catch (e: Exception) {
-                    null // 파일 처리 중 문제가 발생하면 null 반환
-                }
+                val fileName = getFileName(uri)
+                val mimeType = getApplication<Application>().contentResolver.getType(uri) ?: "application/octet-stream"
+                val file = uriToFile(uri, fileName)
+                FileDetail(file, mimeType, fileName)
             }
-
             // 게시글 작성 API 호출
             val postResponse = withContext(Dispatchers.IO) {
                 boardApi.writePost("Bearer $token", boardWriteDto).execute()
             }
-
             if (postResponse.isSuccessful) {
+                onPostComplete()
+                fetchBoardData()
                 val createdBoardId = postResponse.body()?.boardId
                 fileDetails.forEach { fileDetail ->
                     if (createdBoardId != null) {
                         uploadFile(createdBoardId, fileDetail, token)
                     }
                 }
-            } else {
-                // 게시글 작성 실패 처리
             }
         }
     }
@@ -153,28 +109,16 @@ class BoardViewModel(application: Application) : AndroidViewModel(application) {
         }
         return file
     }
-    // 파일 업로드 함수 (Context 대신 필요한 정보를 받음)
+
     private suspend fun uploadFile(boardId: Long, fileDetail: FileDetail, token: String?) {
-        try {
-            // 파일 업로드 API 호출
-            val requestBody = fileDetail.file.asRequestBody(fileDetail.mimeType.toMediaTypeOrNull())
-            val multipartBody = MultipartBody.Part.createFormData("file", fileDetail.fileName, requestBody)
+        val requestBody = fileDetail.file.asRequestBody(fileDetail.mimeType.toMediaTypeOrNull())
+        val multipartBody = MultipartBody.Part.createFormData("file", fileDetail.fileName, requestBody)
 
-            val response = withContext(Dispatchers.IO) {
-                fileApi.uploadFile("Bearer $token", boardId, multipartBody).execute()
-            }
-
-            if (response.isSuccessful) {
-                // 파일 업로드 성공 처리
-            } else {
-                // 파일 업로드 실패 처리
-            }
-        } catch (e: Exception) {
-            // 예외 처리
+        val response = withContext(Dispatchers.IO) {
+            fileApi.uploadFile("Bearer $token", boardId, multipartBody).execute()
         }
     }
 
-    // 확장 함수로 파일 이름 가져오기
     private fun getFileName(uri: Uri): String {
         var result: String? = null
         if (uri.scheme == "content") {
@@ -194,4 +138,15 @@ class BoardViewModel(application: Application) : AndroidViewModel(application) {
         }
         return result ?: "unknown"
     }
+
+    fun deleteBoard(boardId: Long) {
+        val token = SharedPreferencesUtils.getToken(getApplication<Application>().applicationContext)
+        viewModelScope.launch {
+            withContext(Dispatchers.IO) {
+                boardApi.deleteBoard("Bearer $token", boardId).execute()
+            }
+            fetchBoardData()
+        }
+    }
+
 }

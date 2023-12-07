@@ -10,12 +10,12 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.lifecycle.ViewModelProvider
-import kr.ac.kumoh.ce.s20190633.todayfitcomplete_frontend.ViewModel.MemberViewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import kr.ac.kumoh.ce.s20190633.todayfitcomplete_frontend.ViewModel.BoardViewModel
 import kr.ac.kumoh.ce.s20190633.todayfitcomplete_frontend.ViewModel.CommentViewModel
+import kr.ac.kumoh.ce.s20190633.todayfitcomplete_frontend.ViewModel.MemberViewModel
 import kr.ac.kumoh.ce.s20190633.todayfitcomplete_frontend.ViewModel.MemberViewModelFactory
 
 enum class Screen(val route: String) {
@@ -36,16 +36,12 @@ class MainActivity : ComponentActivity() {
         val commentViewModel: CommentViewModel by viewModels()
         setContent {
             val navController = rememberNavController()
-
             NavHost(navController = navController, startDestination = Screen.Login.name) {
                 composable(Screen.Login.route) {
-                    LoginScreen(memberViewModel,
-                        onNavigateToRegister = { navController.navigate(Screen.Register.name) },
-                        onLoginSuccess = { navController.navigate(Screen.BoardList.name) }
-                    )
+                    LoginScreen(memberViewModel, navController)
                 }
                 composable(Screen.Register.route) {
-                    RegisterScreen(memberViewModel) { navController.popBackStack() }
+                    RegisterScreen(memberViewModel, navController)
                 }
                 composable(Screen.BoardList.route){
                     BoardListScreen(boardViewModel, navController)
@@ -53,13 +49,11 @@ class MainActivity : ComponentActivity() {
                 composable(Screen.BoardDetail.route) { backStackEntry ->
                     val boardId = backStackEntry.arguments?.getString("boardId")?.toLongOrNull()
                     if (boardId != null) {
-                        BoardDetailScreen(boradViewModel = boardViewModel, commentViewModel = commentViewModel, boardId = boardId)
-                    } else {
-                        // boardId가 null일 경우 처리 (에러 메시지 표시 또는 다른 화면으로 이동)
+                        BoardDetailScreen(boardViewModel = boardViewModel, commentViewModel = commentViewModel, boardId = boardId, navController = navController)
                     }
                 }
                 composable("boardWrite") {
-                    BoardWriteScreen(boardViewModel)
+                    BoardWriteScreen(boardViewModel, navController)
                 }
             }
         }

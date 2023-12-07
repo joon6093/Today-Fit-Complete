@@ -1,9 +1,22 @@
+
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.FitnessCenter
 import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -12,51 +25,114 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
+import kr.ac.kumoh.ce.s20190633.todayfitcomplete_frontend.R
+import kr.ac.kumoh.ce.s20190633.todayfitcomplete_frontend.Screen
 import kr.ac.kumoh.ce.s20190633.todayfitcomplete_frontend.ViewModel.MemberViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun LoginScreen(viewModel: MemberViewModel, onNavigateToRegister: () -> Unit, onLoginSuccess: () -> Unit) {
+fun LoginScreen(viewModel: MemberViewModel, navController: NavController) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
-    //로그인 처리
-    val loginState by viewModel.isLoggedIn.observeAsState()
+    var isLoading by remember { mutableStateOf(false) }
+    var loginError by remember { mutableStateOf(false) }
+    val scrollState = rememberScrollState()
 
-    Column(modifier = Modifier.padding(16.dp)) {
+    viewModel.isLoggedIn.observeAsState().value?.let { loggedIn ->
+        if (loggedIn) {
+            navController.navigate(Screen.BoardList.route) {
+                popUpTo(Screen.Login.route) { inclusive = true } // 로그인 화면을 스택에서 제거
+            }
+        }
+    }
+
+    Column(modifier = Modifier
+        .verticalScroll(scrollState)
+        .padding(16.dp)
+        .fillMaxWidth()) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Icon(Icons.Filled.FitnessCenter, contentDescription = "오운완 로고", Modifier.size(40.dp))
+            Spacer(modifier = Modifier.width(8.dp))
+            Text(text = "오운완", style = MaterialTheme.typography.titleLarge)
+            Spacer(modifier = Modifier.width(8.dp))
+            Text(
+                text = ": 오늘 운동 완료 인증 애플리케이션",
+                style = MaterialTheme.typography.bodySmall.copy(fontWeight = FontWeight.Bold),
+                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
+            )
+        }
+        Spacer(modifier = Modifier.height(10.dp))
+
+        Image(
+            painter = painterResource(id = R.drawable.todayfitcomplete_login),
+            contentDescription = "로그인 사진",
+            modifier = Modifier.fillMaxWidth(),
+            contentScale = ContentScale.Crop
+        )
+        Spacer(modifier = Modifier.height(5.dp))
+
+        Text(
+            text = "다른 사용자들에게 오늘의 운동을 인증하고 인정받으세요!",
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurface
+        )
+        Spacer(modifier = Modifier.height(10.dp))
+
         OutlinedTextField(
             value = email,
             onValueChange = { email = it },
-            label = { Text("이메일") }
+            label = { Text("이메일") },
+            modifier = Modifier.fillMaxWidth()
         )
-
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(modifier = Modifier.height(20.dp))
 
         OutlinedTextField(
             value = password,
             onValueChange = { password = it },
             label = { Text("비밀번호") },
-            visualTransformation = PasswordVisualTransformation()
+            visualTransformation = PasswordVisualTransformation(),
+            modifier = Modifier.fillMaxWidth()
         )
+        Spacer(modifier = Modifier.height(20.dp))
 
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        Button(onClick = { viewModel.login(email, password) }) {
-            Text("로그인")
-        }
-
-        loginState?.let { loggedIn ->
-            if (loggedIn) {
-                onLoginSuccess() // 로그인 성공 시 호출되는 콜백
+        Button(
+            onClick = {
+                isLoading = true
+                viewModel.login(email, password)
+                isLoading = false
+            },
+            enabled = email.isNotEmpty() && password.isNotEmpty() && !isLoading,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            if (isLoading) {
+                CircularProgressIndicator(color = MaterialTheme.colorScheme.onPrimary)
+            } else {
+                Text("로그인")
             }
         }
 
+        if (loginError) {
+            Text(
+                text = "아이디와 비밀번호가 일치하지 않습니다.",
+                color = MaterialTheme.colorScheme.error,
+                style = MaterialTheme.typography.bodySmall
+            )
+        }
+
         Spacer(modifier = Modifier.height(16.dp))
 
-        Button(onClick = onNavigateToRegister) {
+        Button(
+            onClick = { navController.navigate(Screen.Register.route) },
+            modifier = Modifier.fillMaxWidth()
+        ) {
             Text("회원가입 하러 가기")
         }
     }
