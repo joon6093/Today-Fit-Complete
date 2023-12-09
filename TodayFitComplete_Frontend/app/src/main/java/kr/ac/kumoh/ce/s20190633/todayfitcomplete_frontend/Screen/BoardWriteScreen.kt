@@ -1,15 +1,7 @@
-
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AddPhotoAlternate
 import androidx.compose.material.icons.filled.FileCopy
@@ -37,11 +29,14 @@ import kr.ac.kumoh.ce.s20190633.todayfitcomplete_frontend.ViewModel.BoardViewMod
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BoardWriteScreen(viewModel: BoardViewModel, navController: NavController) {
+    // 게시물 제목과 내용을 저장하는 변수
     var title by remember { mutableStateOf("") }
     var content by remember { mutableStateOf("") }
+    // 선택된 파일 URI 목록을 저장하는 변수
     var selectedFileUris by remember { mutableStateOf<List<Uri>>(emptyList()) }
 
     val context = LocalContext.current
+    // 갤러리 열기 액티비티를 실행하는 런처를 초기화
     val galleryLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetMultipleContents()
     ) { uris: List<Uri>? ->
@@ -51,6 +46,7 @@ fun BoardWriteScreen(viewModel: BoardViewModel, navController: NavController) {
     }
 
     Column(modifier = Modifier.padding(16.dp)) {
+        // 제목 입력 필드
         OutlinedTextField(
             value = title,
             onValueChange = { title = it },
@@ -59,6 +55,7 @@ fun BoardWriteScreen(viewModel: BoardViewModel, navController: NavController) {
         )
         Spacer(modifier = Modifier.height(8.dp))
 
+        // 내용 입력 필드 (다중 라인)
         OutlinedTextField(
             value = content,
             onValueChange = { content = it },
@@ -69,6 +66,7 @@ fun BoardWriteScreen(viewModel: BoardViewModel, navController: NavController) {
         )
         Spacer(modifier = Modifier.height(16.dp))
 
+        // 갤러리 열기 버튼
         Button(
             onClick = { galleryLauncher.launch("*/*") },
             modifier = Modifier.fillMaxWidth()
@@ -79,8 +77,10 @@ fun BoardWriteScreen(viewModel: BoardViewModel, navController: NavController) {
         }
         Spacer(modifier = Modifier.height(8.dp))
 
+        // 게시글 작성 버튼
         Button(
             onClick = {
+                // 제목, 내용, 선택된 파일 URI 목록을 사용하여 게시글 작성 요청
                 viewModel.writePostWithFiles(title, content, selectedFileUris) {
                     navController.popBackStack()
                 }
@@ -94,6 +94,7 @@ fun BoardWriteScreen(viewModel: BoardViewModel, navController: NavController) {
 
         Spacer(modifier = Modifier.height(8.dp))
 
+        // 선택된 파일 목록 표시
         Text("선택된 파일 목록:", style = MaterialTheme.typography.bodyMedium)
         selectedFileUris.forEachIndexed { index, uri ->
             Card(
@@ -125,4 +126,3 @@ fun BoardWriteScreen(viewModel: BoardViewModel, navController: NavController) {
         }
     }
 }
-

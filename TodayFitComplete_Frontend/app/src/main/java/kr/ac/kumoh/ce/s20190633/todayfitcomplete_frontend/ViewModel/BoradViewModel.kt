@@ -13,8 +13,8 @@ import kotlinx.coroutines.withContext
 import kr.ac.kumoh.ce.s20190633.todayfitcomplete_frontend.ApiService.BoardApiService
 import kr.ac.kumoh.ce.s20190633.todayfitcomplete_frontend.ApiService.FileApiService
 import kr.ac.kumoh.ce.s20190633.todayfitcomplete_frontend.Dto.Board.BoardDetailsResponse
-import kr.ac.kumoh.ce.s20190633.todayfitcomplete_frontend.Dto.Borad.BoardListResponse
-import kr.ac.kumoh.ce.s20190633.todayfitcomplete_frontend.Dto.Borad.BoardWriteDto
+import kr.ac.kumoh.ce.s20190633.todayfitcomplete_frontend.Dto.Board.BoardListResponse
+import kr.ac.kumoh.ce.s20190633.todayfitcomplete_frontend.Dto.Board.BoardWriteDto
 import kr.ac.kumoh.ce.s20190633.todayfitcomplete_frontend.SharedPreferencesUtils
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
@@ -42,8 +42,11 @@ class BoardViewModel(application: Application) : AndroidViewModel(application) {
         fetchBoardData()
     }
 
+    // 게시판 목록을 LiveData로 관리
     val boardList: LiveData<List<BoardListResponse>>
         get() = _boardList
+
+    // 게시판 목록을 가져오는 함수
     private fun fetchBoardData() {
         viewModelScope.launch {
             val response = withContext(Dispatchers.IO) {
@@ -57,8 +60,11 @@ class BoardViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
+    // 게시글 상세 정보를 LiveData로 관리
     private val _boardDetails = MutableLiveData<BoardDetailsResponse>()
     val boardDetails: LiveData<BoardDetailsResponse> = _boardDetails
+
+    // 특정 게시글의 상세 정보를 가져오는 함수
     fun fetchBoardDetails(boardId: Long) {
         viewModelScope.launch {
             val response = withContext(Dispatchers.IO) {
@@ -70,6 +76,7 @@ class BoardViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
+    // 게시글 작성 및 파일 업로드 함수
     fun writePostWithFiles(title: String, content: String, fileUris: List<Uri>, onPostComplete: () -> Unit) {
         val token = SharedPreferencesUtils.getToken(getApplication<Application>().applicationContext)
         val boardWriteDto = BoardWriteDto(title, content)
@@ -99,6 +106,7 @@ class BoardViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
+    // Uri를 File 객체로 변환하는 함수
     private fun uriToFile(uri: Uri, fileName: String): File {
         val inputStream = getApplication<Application>().contentResolver.openInputStream(uri)
         val file = File(getApplication<Application>().cacheDir, fileName)
@@ -110,6 +118,7 @@ class BoardViewModel(application: Application) : AndroidViewModel(application) {
         return file
     }
 
+    // 파일 업로드 함수
     private suspend fun uploadFile(boardId: Long, fileDetail: FileDetail, token: String?) {
         val requestBody = fileDetail.file.asRequestBody(fileDetail.mimeType.toMediaTypeOrNull())
         val multipartBody = MultipartBody.Part.createFormData("file", fileDetail.fileName, requestBody)
@@ -119,6 +128,7 @@ class BoardViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
+    // Uri에서 파일 이름을 가져오는 함수
     private fun getFileName(uri: Uri): String {
         var result: String? = null
         if (uri.scheme == "content") {
@@ -139,6 +149,7 @@ class BoardViewModel(application: Application) : AndroidViewModel(application) {
         return result ?: "unknown"
     }
 
+    // 게시글 삭제 함수
     fun deleteBoard(boardId: Long) {
         val token = SharedPreferencesUtils.getToken(getApplication<Application>().applicationContext)
         viewModelScope.launch {
@@ -148,5 +159,4 @@ class BoardViewModel(application: Application) : AndroidViewModel(application) {
             fetchBoardData()
         }
     }
-
 }

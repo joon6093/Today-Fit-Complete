@@ -35,6 +35,7 @@ fun RegisterScreen(viewModel: MemberViewModel, navController: NavController) {
 
     val context = LocalContext.current
 
+    // 회원 가입 결과 메시지를 토스트 메시지로 표시하는 부분입니다.
     LaunchedEffect(registrationStatus) {
         registrationStatus?.let { status ->
             Toast.makeText(context, status, Toast.LENGTH_SHORT).show()
@@ -47,12 +48,14 @@ fun RegisterScreen(viewModel: MemberViewModel, navController: NavController) {
         }
     }
 
+    // 회원 가입 화면의 UI를 구성하는 부분입니다.
     Column(
         modifier = Modifier
             .verticalScroll(scrollState)
             .padding(16.dp)
             .fillMaxWidth()
     ) {
+        // 이미지를 표시합니다.
         Image(
             painter = painterResource(id = R.drawable.todayfitcomplete_register),
             contentDescription = "타이틀 사진",
@@ -62,12 +65,14 @@ fun RegisterScreen(viewModel: MemberViewModel, navController: NavController) {
 
         Spacer(modifier = Modifier.height(16.dp))
 
+        // 회원 가입 제목을 표시합니다.
         Text("회원가입",
             style = MaterialTheme.typography.headlineMedium,
             modifier = Modifier.fillMaxWidth())
 
         Spacer(modifier = Modifier.height(16.dp))
 
+        // 이메일 입력 필드와 중복 확인 버튼을 표시합니다.
         OutlinedTextField(
             value = email,
             onValueChange = {
@@ -101,6 +106,8 @@ fun RegisterScreen(viewModel: MemberViewModel, navController: NavController) {
         )
 
         Spacer(modifier = Modifier.height(8.dp))
+
+        // 비밀번호 입력 필드와 비밀번호 확인 입력 필드를 표시합니다.
         OutlinedTextField(
             value = password,
             onValueChange = { password = it },
@@ -121,6 +128,7 @@ fun RegisterScreen(viewModel: MemberViewModel, navController: NavController) {
 
         Spacer(modifier = Modifier.height(8.dp))
 
+        // 사용자 이름 입력 필드를 표시합니다.
         OutlinedTextField(
             value = username,
             onValueChange = { username = it },
@@ -134,6 +142,7 @@ fun RegisterScreen(viewModel: MemberViewModel, navController: NavController) {
 
         Spacer(modifier = Modifier.height(16.dp))
 
+        // 회원 가입 버튼을 표시합니다.
         Button(
             onClick = {
                 viewModel.register(MemberRegisterDto(email, password, passwordCheck, username))
@@ -145,7 +154,8 @@ fun RegisterScreen(viewModel: MemberViewModel, navController: NavController) {
         }
 
         Spacer(modifier = Modifier.height(16.dp))
-        
+
+        // 로그인 화면으로 이동하는 버튼을 표시합니다.
         Button(
             onClick = { navController.navigate(Screen.Login.route) },
             modifier = Modifier.fillMaxWidth()

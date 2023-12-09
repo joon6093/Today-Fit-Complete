@@ -46,6 +46,7 @@ fun LoginScreen(viewModel: MemberViewModel, navController: NavController) {
     var loginError by remember { mutableStateOf(false) }
     val scrollState = rememberScrollState()
 
+    // ViewModel에서 로그인 상태를 관찰하고, 로그인되었을 때 화면을 이동하는 부분입니다.
     viewModel.isLoggedIn.observeAsState().value?.let { loggedIn ->
         if (loggedIn) {
             navController.navigate(Screen.BoardList.route) {
@@ -54,10 +55,12 @@ fun LoginScreen(viewModel: MemberViewModel, navController: NavController) {
         }
     }
 
+    // 로그인 화면의 UI를 구성하는 부분입니다.
     Column(modifier = Modifier
         .verticalScroll(scrollState)
         .padding(16.dp)
         .fillMaxWidth()) {
+        // 화면 상단에 로고와 앱 이름을 표시합니다.
         Row(verticalAlignment = Alignment.CenterVertically) {
             Icon(Icons.Filled.FitnessCenter, contentDescription = "오운완 로고", Modifier.size(40.dp))
             Spacer(modifier = Modifier.width(8.dp))
@@ -71,6 +74,7 @@ fun LoginScreen(viewModel: MemberViewModel, navController: NavController) {
         }
         Spacer(modifier = Modifier.height(10.dp))
 
+        // 이미지를 표시합니다.
         Image(
             painter = painterResource(id = R.drawable.todayfitcomplete_login),
             contentDescription = "로그인 사진",
@@ -79,6 +83,7 @@ fun LoginScreen(viewModel: MemberViewModel, navController: NavController) {
         )
         Spacer(modifier = Modifier.height(5.dp))
 
+        // 로그인 안내 메시지를 표시합니다.
         Text(
             text = "다른 사용자들에게 오늘의 운동을 인증하고 인정받으세요!",
             style = MaterialTheme.typography.bodyMedium,
@@ -86,6 +91,7 @@ fun LoginScreen(viewModel: MemberViewModel, navController: NavController) {
         )
         Spacer(modifier = Modifier.height(10.dp))
 
+        // 이메일 입력 필드
         OutlinedTextField(
             value = email,
             onValueChange = { email = it },
@@ -94,6 +100,7 @@ fun LoginScreen(viewModel: MemberViewModel, navController: NavController) {
         )
         Spacer(modifier = Modifier.height(20.dp))
 
+        // 비밀번호 입력 필드
         OutlinedTextField(
             value = password,
             onValueChange = { password = it },
@@ -103,6 +110,7 @@ fun LoginScreen(viewModel: MemberViewModel, navController: NavController) {
         )
         Spacer(modifier = Modifier.height(20.dp))
 
+        // 로그인 버튼
         Button(
             onClick = {
                 isLoading = true
@@ -119,6 +127,7 @@ fun LoginScreen(viewModel: MemberViewModel, navController: NavController) {
             }
         }
 
+        // 로그인 오류 메시지를 표시합니다.
         if (loginError) {
             Text(
                 text = "아이디와 비밀번호가 일치하지 않습니다.",
@@ -129,6 +138,7 @@ fun LoginScreen(viewModel: MemberViewModel, navController: NavController) {
 
         Spacer(modifier = Modifier.height(16.dp))
 
+        // 회원가입 화면으로 이동하는 버튼
         Button(
             onClick = { navController.navigate(Screen.Register.route) },
             modifier = Modifier.fillMaxWidth()

@@ -1,4 +1,3 @@
-
 import android.widget.VideoView
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -51,24 +50,31 @@ import kr.ac.kumoh.ce.s20190633.todayfitcomplete_frontend.ViewModel.CommentViewM
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BoardDetailScreen(boardViewModel: BoardViewModel, commentViewModel: CommentViewModel, boardId: Long, navController: NavController) {
+    // 새로 작성한 댓글 내용을 저장하는 변수
     var newCommentText by remember { mutableStateOf("") }
+    // 게시물 상세 정보 및 댓글 목록을 가져옴
     val boardDetails by boardViewModel.boardDetails.observeAsState()
     val comments by commentViewModel.commentsLiveData.observeAsState()
     val context = LocalContext.current
+    // 현재 사용자의 이메일 주소를 가져옴
     val currentUserEmail = SharedPreferencesUtils.getEmail(context)
+    // 스크롤 상태를 저장하는 변수
     val scrollState = rememberScrollState()
 
+    // 화면이 처음 열릴 때 게시물 상세 정보와 댓글 목록을 가져옴
     LaunchedEffect(boardId) {
         boardViewModel.fetchBoardDetails(boardId)
         commentViewModel.fetchComments(boardId)
     }
 
+    // 게시물 상세 정보가 있을 경우 아래의 화면을 그립니다.
     boardDetails?.let { details ->
         Column(
             modifier = Modifier
                 .verticalScroll(scrollState)
                 .padding(16.dp)
         ) {
+            // 게시물 제목과 작성자 정보 표시
             Row(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically,
@@ -76,6 +82,7 @@ fun BoardDetailScreen(boardViewModel: BoardViewModel, commentViewModel: CommentV
             ) {
                 Text(text = details.title, style = MaterialTheme.typography.titleMedium)
                 Row(verticalAlignment = Alignment.CenterVertically) {
+                    // 조회수와 작성일 정보 표시
                     Icon(Icons.Filled.Visibility, contentDescription = "조회수", Modifier.size(18.dp))
                     Spacer(modifier = Modifier.width(4.dp))
                     Text(text = "${details.viewCount}회", style = MaterialTheme.typography.bodySmall)
@@ -85,6 +92,7 @@ fun BoardDetailScreen(boardViewModel: BoardViewModel, commentViewModel: CommentV
                         text = details.createdDate.substringBeforeLast(':'),
                         style = MaterialTheme.typography.bodySmall
                     )
+                    // 현재 사용자가 게시물 작성자인 경우 삭제 버튼 표시
                     if (details.writerName == currentUserEmail) {
                         IconButton(
                             onClick = {
@@ -98,6 +106,7 @@ fun BoardDetailScreen(boardViewModel: BoardViewModel, commentViewModel: CommentV
                     }
                 }
             }
+            // 작성자 정보 표시
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.End,
@@ -108,9 +117,11 @@ fun BoardDetailScreen(boardViewModel: BoardViewModel, commentViewModel: CommentV
                 Text(text = details.writerName, style = MaterialTheme.typography.bodySmall)
             }
             Spacer(modifier = Modifier.height(8.dp))
+            // 게시물 내용 표시
             Text(text = details.content, style = MaterialTheme.typography.bodyLarge)
             Spacer(modifier = Modifier.height(16.dp))
 
+            // 첨부 파일 표시
             details.files.forEach { file ->
                 Card(
                     modifier = Modifier
@@ -120,6 +131,7 @@ fun BoardDetailScreen(boardViewModel: BoardViewModel, commentViewModel: CommentV
                 ) {
                     Column(modifier = Modifier.padding(16.dp)) {
                         when {
+                            // 이미지 파일인 경우
                             file.fileType.startsWith("image") -> {
                                 AsyncImage(
                                     model = "https://port-0-todayfitcomplete-1drvf2llomgqfda.sel5.cloudtype.app/files/${file.filePath}",
@@ -131,10 +143,12 @@ fun BoardDetailScreen(boardViewModel: BoardViewModel, commentViewModel: CommentV
                                 )
                             }
 
+                            // 비디오 파일인 경우
                             file.fileType.startsWith("video") -> {
                                 AndroidView(
                                     factory = { context ->
                                         VideoView(context).apply {
+                                            // 비디오 파일의 URL을 설정하고 클릭 시 재생 또는 일시 정지
                                             setVideoPath("https://port-0-todayfitcomplete-1drvf2llomgqfda.sel5.cloudtype.app/files/${file.filePath}")
                                             setOnClickListener {
                                                 if (!isPlaying) {
@@ -160,6 +174,7 @@ fun BoardDetailScreen(boardViewModel: BoardViewModel, commentViewModel: CommentV
             }
             Spacer(modifier = Modifier.height(16.dp))
 
+            // 댓글 목록 표시
             comments?.forEach { comment ->
                 Column(
                     modifier = Modifier
@@ -214,6 +229,7 @@ fun BoardDetailScreen(boardViewModel: BoardViewModel, commentViewModel: CommentV
                                     )
                                 }
                                 Row(verticalAlignment = Alignment.CenterVertically) {
+                                    // 댓글 작성자인 경우 삭제 버튼 표시
                                     IconButton(
                                         onClick = {
                                             if (comment.commentWriterName == currentUserEmail) {
@@ -230,10 +246,12 @@ fun BoardDetailScreen(boardViewModel: BoardViewModel, commentViewModel: CommentV
                             }
                         }
                     }
+                    // 댓글 사이에 구분선 추가
                     Divider(color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.2f))
                 }
             }
 
+            // 댓글 작성 입력란 및 게시 버튼
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically,
@@ -252,7 +270,6 @@ fun BoardDetailScreen(boardViewModel: BoardViewModel, commentViewModel: CommentV
                     Icon(Icons.Filled.Send, contentDescription = "게시")
                 }
             }
-
         }
     }
 }
