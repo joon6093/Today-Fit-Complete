@@ -2,9 +2,9 @@ package kr.ac.kumoh.ce.s20190633.todayfitcomplete_frontend.ViewModel
 
 import android.app.Application
 import android.util.Log
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -17,7 +17,7 @@ import kr.ac.kumoh.ce.s20190633.todayfitcomplete_frontend.SharedPreferencesUtils
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
-class MemberViewModel(private val application: Application) : ViewModel() {
+class MemberViewModel(application: Application) : AndroidViewModel(application) {
     private val SERVER_URL = "https://port-0-todayfitcomplete-1drvf2llomgqfda.sel5.cloudtype.app"
     private val memberApiService: MemberApiService
 
@@ -84,8 +84,9 @@ class MemberViewModel(private val application: Application) : ViewModel() {
                 if (response.isSuccessful && response.body() != null) {
                     val token = response.body()!!.token
                     // SharedPreferences를 사용하여 토큰과 사용자 이메일 저장
-                    SharedPreferencesUtils.saveToken(application, token)
-                    SharedPreferencesUtils.saveEmail(application, email)
+                    val context = getApplication<Application>().applicationContext
+                    SharedPreferencesUtils.saveToken(context, token)
+                    SharedPreferencesUtils.saveEmail(context, email)
                     _isLoggedIn.postValue(true)
                 } else {
                     _isLoggedIn.postValue(false)

@@ -9,14 +9,12 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
-import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import kr.ac.kumoh.ce.s20190633.todayfitcomplete_frontend.ViewModel.BoardViewModel
 import kr.ac.kumoh.ce.s20190633.todayfitcomplete_frontend.ViewModel.CommentViewModel
 import kr.ac.kumoh.ce.s20190633.todayfitcomplete_frontend.ViewModel.MemberViewModel
-import kr.ac.kumoh.ce.s20190633.todayfitcomplete_frontend.ViewModel.MemberViewModelFactory
 
 enum class Screen(val route: String) {
     Login("login"),
@@ -27,11 +25,9 @@ enum class Screen(val route: String) {
 
 
 class MainActivity : ComponentActivity() {
-    private lateinit var memberViewModel: MemberViewModel
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val viewModelFactory = MemberViewModelFactory(application)
-        memberViewModel = ViewModelProvider(this, viewModelFactory).get(MemberViewModel::class.java)
+        val memberViewModel: MemberViewModel by viewModels()
         val boardViewModel: BoardViewModel by viewModels()
         val commentViewModel: CommentViewModel by viewModels()
         setContent {
