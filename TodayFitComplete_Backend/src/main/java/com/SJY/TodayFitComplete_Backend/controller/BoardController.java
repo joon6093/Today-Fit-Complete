@@ -97,13 +97,15 @@ public class BoardController {
      *
      * @param boardId 수정할 게시글 ID
      * @param boardDTO 수정할 게시글 정보
+     * @param member 인증된 사용자 정보
      * @return 수정된 게시글 정보
      */
     @PatchMapping("/{boardId}/update")
     public ResponseEntity<BoardDetailsResponse> update(
             @PathVariable Long boardId,
-            @RequestBody BoardUpdateDto boardDTO) {
-        BoardDetailsResponse updateBoardDTO = boardService.update(boardId, boardDTO);
+            @RequestBody BoardUpdateDto boardDTO,
+            @AuthenticationPrincipal Member member) {
+        BoardDetailsResponse updateBoardDTO = boardService.update(boardId, boardDTO, member);
         return ResponseEntity.status(HttpStatus.OK).body(updateBoardDTO);
     }
 
@@ -111,11 +113,12 @@ public class BoardController {
      * 특정 게시글을 삭제합니다.
      *
      * @param boardId 삭제할 게시글 ID
+     * @param member 인증된 사용자 정보
      * @return 삭제된 게시글 ID
      */
     @DeleteMapping("/{boardId}/delete")
-    public ResponseEntity<Long> delete(@PathVariable Long boardId) {
-        boardService.delete(boardId);
+    public ResponseEntity<Long> delete(@PathVariable Long boardId, @AuthenticationPrincipal Member member) {
+        boardService.delete(boardId, member);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 }

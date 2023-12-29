@@ -31,7 +31,7 @@ public class MemberController {
     @GetMapping("/checkId")
     public ResponseEntity<?> checkIdDuplicate(@RequestParam String email) {
         memberService.checkIdDuplicate(email);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.status(HttpStatus.OK).build();
     }
 
     /**
@@ -55,7 +55,7 @@ public class MemberController {
     @PostMapping("/login")
     public ResponseEntity<MemberTokenResponse> login(@RequestBody MemberLoginDto memberLoginDTO) {
         MemberTokenResponse loginResult = memberService.login(memberLoginDTO);
-        return ResponseEntity.ok().header(loginResult.getToken()).body(loginResult);
+        return ResponseEntity.status(HttpStatus.OK).header(loginResult.getToken()).body(loginResult);
     }
 
     /**
@@ -70,7 +70,7 @@ public class MemberController {
                                                         @RequestBody Map<String, String> request) {
         String password = request.get("password");
         MemberResponse memberInfo = memberService.check(member, password);
-        return ResponseEntity.ok(memberInfo);
+        return ResponseEntity.status(HttpStatus.OK).body(memberInfo);
     }
 
     /**
@@ -84,7 +84,7 @@ public class MemberController {
     public ResponseEntity<MemberResponse> update(@AuthenticationPrincipal Member member,
                                                  @RequestBody MemberUpdateDto memberUpdateDTO) {
         MemberResponse updatedMember = memberService.update(member, memberUpdateDTO);
-        return ResponseEntity.ok(updatedMember);
+        return ResponseEntity.status(HttpStatus.OK).body(updatedMember);
     }
 }
 

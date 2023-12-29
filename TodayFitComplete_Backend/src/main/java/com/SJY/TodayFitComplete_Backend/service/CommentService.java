@@ -1,5 +1,6 @@
 package com.SJY.TodayFitComplete_Backend.service;
 
+import com.SJY.TodayFitComplete_Backend.common.exception.MemberException;
 import com.SJY.TodayFitComplete_Backend.common.exception.ResourceNotFoundException;
 import com.SJY.TodayFitComplete_Backend.dto.request.comment.CommentDto;
 import com.SJY.TodayFitComplete_Backend.dto.response.comment.CommentResponse;
@@ -15,6 +16,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -61,10 +63,15 @@ public class CommentService {
     /**
      * 댓글 수정
      */
-    public CommentResponse update(Long commentId, CommentDto commentDto) {
+    public CommentResponse update(Long commentId, CommentDto commentDto, Member currentMember) {
         Comment comment = commentRepository.findCommentWithMemberAndBoardById(commentId).orElseThrow(
                 () -> new ResourceNotFoundException("Comment", "Comment Id", String.valueOf(commentId))
         );
+
+        if (!comment.getMember().equals(currentMember)) {
+            throw new MemberException("You do not have permission to edit this comment.", HttpStatus.FORBIDDEN);
+        }
+
         comment.update(commentDto.getContent());
         return CommentResponse.fromEntity(comment);
     }
@@ -72,7 +79,15 @@ public class CommentService {
     /**
      * 댓글 삭제
      */
-    public void delete(Long commentId) {
+    public void delete(Long commentId, Member currentMember) {
+        Comment comment = commentRepository.findCommentWithMemberAndBoardById(commentId).orElseThrow(
+                () -> new ResourceNotFoundException("Comment", "Comment Id", String.valueOf(commentId))
+        );
+
+        if (!comment.getMember().equals(currentMember)) {
+            throw new MemberException("You do not have permission to delete this comment.", HttpStatus.FORBIDDEN);
+        }
+
         commentRepository.deleteById(commentId);
     }
 }

@@ -47,7 +47,7 @@ public class FileController {
     @GetMapping("/download")
     public ResponseEntity<Resource> download(@RequestParam("fileId") Long fileId) throws IOException {
         FileDownloadResponse downloadDto = fileService.download(fileId);
-        return ResponseEntity.ok()
+        return ResponseEntity.status(HttpStatus.OK)
                 .contentType(MediaType.parseMediaType(downloadDto.getFileType()))
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; fileName=\"" + downloadDto.getFilename() + "\"")
                 .body(new ByteArrayResource(downloadDto.getContent()));
@@ -62,7 +62,7 @@ public class FileController {
     @DeleteMapping("/delete")
     public ResponseEntity<Long> delete(@RequestParam("fileId") Long fileId) {
         fileService.delete(fileId);
-        return ResponseEntity.ok(fileId);
+        return  ResponseEntity.status(HttpStatus.OK).body(fileId);
     }
 }
 

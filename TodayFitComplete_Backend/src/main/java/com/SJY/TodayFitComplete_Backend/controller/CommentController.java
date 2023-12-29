@@ -61,27 +61,33 @@ public class CommentController {
      *
      * @param commentId 수정할 댓글 ID
      * @param commentDto 수정할 댓글 데이터
+     * @param member 인증된 사용자 정보
      * @return 수정된 댓글 정보
      */
     @PatchMapping("/update/{commentId}")
     public ResponseEntity<CommentResponse> update(
+            @AuthenticationPrincipal Member member,
             @PathVariable Long commentId,
             @RequestBody CommentDto commentDto) {
 
-        CommentResponse updateCommentDTO = commentService.update(commentId, commentDto);
+        CommentResponse updateCommentDTO = commentService.update(commentId, commentDto, member);
         return ResponseEntity.status(HttpStatus.OK).body(updateCommentDTO);
     }
+
 
     /**
      * 특정 댓글을 삭제합니다.
      *
      * @param commentId 삭제할 댓글 ID
+     * @param member 인증된 사용자 정보
      * @return 삭제된 댓글 ID
      */
     @DeleteMapping("/delete/{commentId}")
-    public ResponseEntity<Long> delete(@PathVariable Long commentId) {
+    public ResponseEntity<Long> delete(
+            @AuthenticationPrincipal Member member,
+            @PathVariable Long commentId) {
 
-        commentService.delete(commentId);
+        commentService.delete(commentId, member);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 }

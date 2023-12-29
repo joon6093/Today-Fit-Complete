@@ -1,5 +1,6 @@
 package com.SJY.TodayFitComplete_Backend.service;
 
+import com.SJY.TodayFitComplete_Backend.common.exception.MemberException;
 import com.SJY.TodayFitComplete_Backend.common.exception.ResourceNotFoundException;
 import com.SJY.TodayFitComplete_Backend.dto.request.board.BoardUpdateDto;
 import com.SJY.TodayFitComplete_Backend.dto.request.board.BoardWriteDto;
@@ -17,6 +18,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -87,18 +89,33 @@ public class BoardService {
     /**
      * 게시글 수정
      */
-    public BoardDetailsResponse update(Long boardId, BoardUpdateDto boardDTO) {
-        Board updateBoard = boardRepository.findBoardWithMemberById(boardId).orElseThrow(
+    public BoardDetailsResponse update(Long boardId, BoardUpdateDto boardDTO, Member currentMember) {
+        Board board = boardRepository.findBoardWithMemberById(boardId).orElseThrow(
                 () -> new ResourceNotFoundException("Board", "Id", String.valueOf(boardId))
         );
-        updateBoard.update(boardDTO.getTitle(), boardDTO.getContent());
-        return BoardDetailsResponse.fromEntity(updateBoard);
+
+        // 게시글의 소유자인지 확인
+        if (!board.getMember().equals(currentMember)) {
+            throw new MemberException("You do not have permission to edit this post.", HttpStatus.FORBIDDEN);
+        }
+
+        board.update(boardDTO.getTitle(), boardDTO.getContent());
+        return BoardDetailsResponse.fromEntity(board);
     }
 
     /**
      * 게시글 삭제
      */
-    public void delete(Long boardId) {
+    public void delete(Long boardId, Member currentMember) {
+        Board board = boardRepository.findBoardWithMemberById(boardId).orElseThrow(
+                () -> new ResourceNotFoundException("Board", "Id", String.valueOf(boardId))
+        );
+
+        // 게시글의 소유자인지 확인
+        if (!board.getMember().equals(currentMember)) {
+            throw new MemberException("You do not have permission to delete this post.", HttpStatus.FORBIDDEN);
+        }
+
         boardRepository.deleteById(boardId);
     }
 }
