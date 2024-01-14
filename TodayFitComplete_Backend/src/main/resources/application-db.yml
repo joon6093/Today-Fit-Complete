@@ -1,5 +1,12 @@
 # 각 환경마다 사용할 Datasource 값 설정
 # 본래는 공개되면 안되는 정보. 공부한 것을 저장하기 위해 gitignore에서 제외함 / 현재는 아래 서비스를 모두 종료해서 안전함
+local-db:
+  host: svc.sel5.cloudtype.app
+  port: 32498
+  name: TodayFitComplete
+  username: root
+  password: 2721
+
 dev-db:
   host: svc.sel5.cloudtype.app
   port: 32498

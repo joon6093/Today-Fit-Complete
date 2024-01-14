@@ -3,9 +3,17 @@
 
 spring:
   profiles:
-    default: dev
+    default: local
+    include: token
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
+  messages:
+    basename: i18n/exception
+    fallback-to-system-locale: false
 ---
 spring:
   config:
     activate:
-      on-profile: dev, prod
+      on-profile: local, dev, prod

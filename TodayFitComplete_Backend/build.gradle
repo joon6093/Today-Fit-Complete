@@ -11,28 +11,42 @@ java {
 	sourceCompatibility = '17'
 }
 
+configurations {
+	compileOnly {
+		extendsFrom annotationProcessor
+	}
+}
 repositories {
 	mavenCentral()
 }
 
 dependencies {
-	implementation 'org.springframework.boot:spring-boot-starter-data-jpa:3.0.4'
-	implementation 'org.springframework.boot:spring-boot-starter-security:3.0.4'
-	implementation 'org.springframework.boot:spring-boot-starter-validation:3.0.4'
-	implementation 'org.springframework.boot:spring-boot-starter-web:3.1.0'
+	// Spring Boot Starter Dependencies
+	implementation 'org.springframework.boot:spring-boot-starter-data-jpa' // JPA
+	implementation 'org.springframework.boot:spring-boot-starter-security' // Security
+	implementation 'org.springframework.boot:spring-boot-starter-web' // Web
 
-	implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
+	// Lombok - Simplify Java code
+	compileOnly 'org.projectlombok:lombok'
+	annotationProcessor 'org.projectlombok:lombok'
 
-	compileOnly 'org.projectlombok:lombok:1.18.26'
+	// Database
 	runtimeOnly 'org.mariadb.jdbc:mariadb-java-client'
 
-	runtimeOnly group: 'io.jsonwebtoken', name: 'jjwt-impl', version: '0.11.5'
-	runtimeOnly group: 'io.jsonwebtoken', name: 'jjwt-jackson', version: '0.11.5'
+	// JWT - JSON Web Token
+	implementation 'io.jsonwebtoken:jjwt:0.9.1'
 
-	annotationProcessor 'org.projectlombok:lombok:1.18.26'
+	// XML and Validation
+	implementation 'javax.xml.bind:jaxb-api:2.3.1' // XML Binding
+	implementation 'org.springframework.boot:spring-boot-starter-validation' // Validation
 
-	testImplementation 'org.springframework.boot:spring-boot-starter-test:3.1.0'
-	testImplementation 'org.springframework.security:spring-security-test:6.0.2'
+	// Test Dependencies
+	testImplementation 'org.springframework.boot:spring-boot-starter-test' // Spring Boot Test
+	testImplementation 'org.springframework.security:spring-security-test' // Spring Security Test
+	testImplementation 'org.projectlombok:lombok:1.18.28' // Lombok for testing
+
+	// SpringDoc - OpenAPI 3
+	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.2.0' // SpringDoc for OpenAPI UI
 }
 
 tasks.named('test') {

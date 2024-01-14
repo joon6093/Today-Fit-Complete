@@ -1,0 +1,6 @@
+# 본래는 공개되면 안되는 정보. 공부한 것을 저장하기 위해 gitignore에서 제외함
+jwt:
+  header: "Authorization"
+  prefix: "Bearer "
+  secret: Y2hvcHBhLWRvbnQtYml0ZS1tZS1zcHJpbmctYm9vdC1qd3QtdGVzdC1zZWNyZXQta2V5LWNob3BwYS1kb250LWJpdGUtbWUtc3ByaW5nLWJvb3Qtand0LXRlc3Qtc2VjcmV0LWtleQo=
+  tokenExpirationTime: 18000
