@@ -57,10 +57,6 @@ public class Member extends BaseTimeEntity implements UserDetails {
         this.username = username;
     }
 
-    /**
-     * Token을 고유한 Email 값으로 생성합니다
-     * @return email;
-     */
     @Override
     public String getUsername() {
         return email;
@@ -74,25 +70,22 @@ public class Member extends BaseTimeEntity implements UserDetails {
     }
 
     @Override
-    public boolean isAccountNonExpired() {  // 니 계정 만료되지는 않았니?
-        return true;
+    public boolean isAccountNonExpired() {
+        throw new UnsupportedOperationException();
     }
 
     @Override
-    public boolean isAccountNonLocked() {   // 니 계정 잠겨있지 않니?
-        return true;
+    public boolean isAccountNonLocked() {
+        throw new UnsupportedOperationException();
     }
 
     @Override
-    public boolean isCredentialsNonExpired() {    // 니 계정 비밀번호 갈아낄때 되지 않았니?
-        return true;
+    public boolean isCredentialsNonExpired() {
+        throw new UnsupportedOperationException();
     }
 
     @Override
-    public boolean isEnabled() {    // 니 계정이 활성화 되어있니?
-        // 우리 사이트에서 1년동안 로그인을 안하면 휴면 계정으로 변환하기로 했다면?
-        // 현재 시간 - 마지막 로그인 시간으로 계산 => 1년 초과하면 false 로 return.
-        // 나머지 비어있는 함수들도 다 비슷하게 구현해주면 된다.
-        return true;
+    public boolean isEnabled() {
+        throw new UnsupportedOperationException();
     }
 }

@@ -2,5 +2,5 @@
 jwt:
   header: "Authorization"
   prefix: "Bearer "
-  secret: Y2hvcHBhLWRvbnQtYml0ZS1tZS1zcHJpbmctYm9vdC1qd3QtdGVzdC1zZWNyZXQta2V5LWNob3BwYS1kb250LWJpdGUtbWUtc3ByaW5nLWJvb3Qtand0LXRlc3Qtc2VjcmV0LWtleQo=
+  key: O2O_Automatic_Store_System_Demo
   tokenExpirationTime: 18000

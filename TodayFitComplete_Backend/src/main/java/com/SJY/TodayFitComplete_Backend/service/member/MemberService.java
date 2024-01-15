@@ -1,6 +1,5 @@
 package com.SJY.TodayFitComplete_Backend.service.member;
 
-import com.SJY.TodayFitComplete_Backend.config.security.token.CustomUserDetailsService;
 import com.SJY.TodayFitComplete_Backend.config.security.token.JwtTokenUtil;
 import com.SJY.TodayFitComplete_Backend.dto.member.*;
 import com.SJY.TodayFitComplete_Backend.entity.member.Member;
@@ -12,7 +11,6 @@ import com.SJY.TodayFitComplete_Backend.repository.member.MemberRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -24,7 +22,6 @@ public class MemberService {
 
     private final PasswordEncoder pwdEncoder;
     private final MemberRepository memberRepository;
-    private final CustomUserDetailsService userDetailsService;
     private final JwtTokenUtil jwtTokenUtil;
 
     /**
@@ -53,19 +50,19 @@ public class MemberService {
      * 로그인
      */
     public MemberTokenResponse login(MemberLoginDto loginDto) {
-        UserDetails userDetails = userDetailsService.loadUserByUsername(loginDto.getEmail());
-        checkEncodePassword(loginDto.getPassword(), userDetails.getPassword());
-        String token = jwtTokenUtil.generateToken(userDetails);
-        return MemberTokenResponse.fromEntity(userDetails, token);
+        Member member = memberRepository.findByEmail(loginDto.getEmail()).orElseThrow(() -> new LoginFailureException());
+        checkEncodePassword(loginDto.getPassword(), member.getPassword());
+        String token = jwtTokenUtil.generateToken(member);
+        return MemberTokenResponse.fromEntity(member, token);
     }
 
     /**
      * 회원 정보 체크
      */
-    public MemberResponse check(Member member, String password) {
-        Member checkMember = (Member) userDetailsService.loadUserByUsername(member.getEmail());
-        checkEncodePassword(password, checkMember.getPassword());
-        return MemberResponse.fromEntity(checkMember);
+    public MemberResponse check(Member currentMember, String password) {
+        Member member = memberRepository.findById(currentMember.getId()).orElseThrow(() -> new MemberNotFoundException(currentMember.getEmail()));
+        checkEncodePassword(password, member.getPassword());
+        return MemberResponse.fromEntity(member);
     }
 
     /**
