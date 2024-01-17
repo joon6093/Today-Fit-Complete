@@ -25,7 +25,7 @@ public class MemberResponse {
     public static MemberResponse fromEntity(Member member) {
         return MemberResponse.builder()
                 .email(member.getEmail())
-                .username(member.getUsername())
+                .username(member.getNickname())
                 .build();
     }
 }

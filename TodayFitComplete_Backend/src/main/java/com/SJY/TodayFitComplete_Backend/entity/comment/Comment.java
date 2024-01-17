@@ -7,6 +7,8 @@ import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 @Entity
 @Getter
@@ -22,10 +24,12 @@ public class Comment extends BaseTimeEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
+    @OnDelete(action = OnDeleteAction.CASCADE)
     public Member member;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "board_id")
+    @OnDelete(action = OnDeleteAction.CASCADE)
     public Board board;
 
     @Builder
@@ -38,15 +42,5 @@ public class Comment extends BaseTimeEntity {
 
     public void update(String content) {
         this.content = content;
-    }
-
-    public void setBoard(Board board) {
-        this.board = board;
-        board.getComments().add(this);
-    }
-
-    public void setMember(Member member) {
-        this.member = member;
-        member.getComments().add(this);
     }
 }

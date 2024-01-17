@@ -13,7 +13,9 @@ import com.SJY.TodayFitComplete_Backend.repository.file.FileRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.repository.query.Param;
 import org.springframework.http.MediaType;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -95,15 +97,18 @@ public class FileService {
     /**
      * 파일 삭제
      */
-    public void delete(Long fileId){
+    @PreAuthorize("@fileAccessHandler.check(#fileId)")
+    public void delete(Long boardId, @Param("fileId")Long fileId){
+        Board board = boardRepository.findById(boardId).orElseThrow(
+                () -> new BoardNotFoundException(boardId.toString()));
         FileEntity file = fileRepository.findById(fileId).orElseThrow(
                 () -> new FileNotFoundException(fileId.toString()));
-        // local 파일을 삭제
         String filePath = FOLDER_PATH + File.separator + file.getFilePath();
-        File physicalFile = new File(filePath);
-        if (physicalFile.exists()) {
-            physicalFile.delete();
+        File localFile = new File(filePath);
+        if (localFile.exists()) {
+            localFile.delete();
         }
+        file.delBoard(board);
         fileRepository.delete(file);
     }
 

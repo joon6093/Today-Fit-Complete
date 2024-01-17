@@ -3,7 +3,6 @@ package com.SJY.TodayFitComplete_Backend.controller.board;
 import com.SJY.TodayFitComplete_Backend.aop.AssignMemberId;
 import com.SJY.TodayFitComplete_Backend.dto.board.*;
 import com.SJY.TodayFitComplete_Backend.dto.response.Response;
-import com.SJY.TodayFitComplete_Backend.entity.member.Member;
 import com.SJY.TodayFitComplete_Backend.service.board.BoardService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -14,7 +13,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -93,15 +91,13 @@ public class BoardController {
      *
      * @param boardId 수정할 게시글 ID
      * @param boardDTO 수정할 게시글 정보
-     * @param member 인증된 사용자 정보
      * @return 수정된 게시글 정보
      */
     @PatchMapping("/update/{boardId}")
     public ResponseEntity<Response> update(
             @PathVariable("boardId") Long boardId,
-            @Valid @RequestBody BoardUpdateRequest boardDTO,
-            @AuthenticationPrincipal Member member) {
-        BoardDetailsResponse updateBoardDTO = boardService.update(boardId, boardDTO, member);
+            @Valid @RequestBody BoardUpdateRequest boardDTO) {
+        BoardDetailsResponse updateBoardDTO = boardService.update(boardId, boardDTO);
         return ResponseEntity.status(HttpStatus.OK).body(Response.success(updateBoardDTO));
     }
 
@@ -109,13 +105,12 @@ public class BoardController {
      * 특정 게시글을 삭제합니다.
      *
      * @param boardId 삭제할 게시글 ID
-     * @param member 인증된 사용자 정보
      * @return 삭제된 게시글 ID
      */
     @DeleteMapping("/delete/{boardId}")
-    public ResponseEntity<Response> delete(@PathVariable("boardId") Long boardId, @AuthenticationPrincipal Member member) {
-        boardService.delete(boardId, member);
-        return ResponseEntity.status(HttpStatus.OK).body(Response.success(boardId));
+    public ResponseEntity<Response> delete(@PathVariable("boardId") Long boardId) {
+        boardService.delete(boardId);
+        return ResponseEntity.status(HttpStatus.OK).body(Response.success());
     }
 }
 

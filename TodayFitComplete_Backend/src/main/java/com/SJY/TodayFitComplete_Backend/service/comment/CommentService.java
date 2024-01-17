@@ -17,7 +17,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.access.AccessDeniedException;
+import org.springframework.data.repository.query.Param;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -36,7 +37,7 @@ public class CommentService {
      * 모든 댓글 조회 및 페이징 처리
      */
     public Page<CommentResponse> getAllComments(Pageable pageable, Long boardId) {
-        Page<Comment> comments = commentRepository.findCommentsWithMemberAndBoardByBoardId(pageable, boardId);
+        Page<Comment> comments = commentRepository.findCommentsWithMemberAndBoardByBoardId(boardId, pageable);
         List<CommentResponse> commentList = comments.getContent().stream()
                 .map(CommentResponse::fromEntity)
                 .collect(Collectors.toList());
@@ -51,9 +52,11 @@ public class CommentService {
                 () -> new BoardNotFoundException(boardId.toString()));
         Member member = memberRepository.findById(writeDto.getMemberId()).orElseThrow(
                 () -> new MemberNotFoundException(writeDto.getMemberId().toString()));
-        Comment comment = CommentWriteRequest.ofEntity(writeDto);
-        comment.setBoard(board);
-        comment.setMember(member);
+        Comment comment = Comment.builder()
+                .content(writeDto.getContent())
+                .board(board)
+                .member(member)
+                .build();
         Comment saveComment = commentRepository.save(comment);
         return CommentResponse.fromEntity(saveComment);
     }
@@ -61,14 +64,10 @@ public class CommentService {
     /**
      * 댓글 수정
      */
-    public CommentResponse update(Long commentId, CommentUpdateRequest commentDto, Member currentMember) {
+    @PreAuthorize("@commentAccessHandler.check(#commentId)")
+    public CommentResponse update(@Param("commentId")Long commentId, CommentUpdateRequest commentDto) {
         Comment comment = commentRepository.findCommentWithMemberAndBoardById(commentId).orElseThrow(
                 () -> new CommentNotFoundException(commentId.toString()));
-
-        if (!comment.getMember().equals(currentMember)) {
-            throw new AccessDeniedException("AccessDeniedException");
-        }
-
         comment.update(commentDto.getContent());
         return CommentResponse.fromEntity(comment);
     }
@@ -76,14 +75,10 @@ public class CommentService {
     /**
      * 댓글 삭제
      */
-    public void delete(Long commentId, Member currentMember) {
+    @PreAuthorize("@commentAccessHandler.check(#commentId)")
+    public void delete(@Param("commentId")Long commentId) {
         Comment comment = commentRepository.findCommentWithMemberAndBoardById(commentId).orElseThrow(
                 () -> new CommentNotFoundException(commentId.toString()));
-
-        if (!comment.getMember().equals(currentMember)) {
-            throw new AccessDeniedException("AccessDeniedException");
-        }
-
-        commentRepository.deleteById(commentId);
+        commentRepository.delete(comment);
     }
 }

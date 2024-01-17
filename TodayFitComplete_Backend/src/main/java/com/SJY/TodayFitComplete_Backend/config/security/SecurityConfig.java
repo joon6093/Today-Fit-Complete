@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -18,6 +19,7 @@ import org.springframework.web.cors.CorsConfigurationSource;
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
+@EnableMethodSecurity(prePostEnabled = true)
 public class SecurityConfig {
 
     private final JwtExceptionFilter jwtExceptionFilter;
@@ -44,6 +46,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/api/member/register", "/api/member/login").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/member/checkPwd").authenticated()
                         .requestMatchers(HttpMethod.PUT, "/api/member/update").authenticated()
+                        .requestMatchers(HttpMethod.DELETE, "/api/member/{memberId}").authenticated()
                         .requestMatchers(HttpMethod.POST, "/api/board/write").authenticated()
                         .requestMatchers(HttpMethod.PUT, "/api/board/update/{boardId}").authenticated()
                         .requestMatchers(HttpMethod.DELETE, "/api/board/delete/{boardId}").authenticated()

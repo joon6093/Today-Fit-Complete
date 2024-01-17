@@ -12,7 +12,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.access.AccessDeniedException;
+import org.springframework.data.repository.query.Param;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -59,10 +60,13 @@ public class BoardService {
      * 게시글 등록
      */
     public BoardWriteResponse write(BoardWriteRequest boardDTO) {
-        Board board = BoardWriteRequest.ofEntity(boardDTO);
         Member member = memberRepository.findById(boardDTO.getMemberId()).orElseThrow(
                 () -> new MemberNotFoundException(boardDTO.getMemberId().toString()));
-        board.setMember(member);
+        Board board = Board.builder()
+                .title(boardDTO.getTitle())
+                .content(boardDTO.getContent())
+                .member(member)
+                .build();
         Board saveBoard = boardRepository.save(board);
         return BoardWriteResponse.fromEntity(saveBoard);
     }
@@ -71,24 +75,19 @@ public class BoardService {
      * 게시글 상세보기
      */
     public BoardDetailsResponse detail(Long boardId) {
-       Board findBoard = boardRepository.findBoardWithMemberById(boardId).orElseThrow(
+       Board board = boardRepository.findBoardWithMemberById(boardId).orElseThrow(
                () -> new BoardNotFoundException(boardId.toString()));
-       findBoard.upViewCount();
-       return BoardDetailsResponse.fromEntity(findBoard);
+        board.upViewCount();
+       return BoardDetailsResponse.fromEntity(board);
     }
 
     /**
      * 게시글 수정
      */
-    public BoardDetailsResponse update(Long boardId, BoardUpdateRequest boardDTO, Member currentMember) {
+    @PreAuthorize("@boardAccessHandler.check(#boardId)")
+    public BoardDetailsResponse update(@Param("boardId")Long boardId, BoardUpdateRequest boardDTO) {
         Board board = boardRepository.findBoardWithMemberById(boardId).orElseThrow(
                 () -> new BoardNotFoundException(boardId.toString()));
-
-        // 게시글의 소유자인지 확인
-        if (!board.getMember().equals(currentMember)) {
-            throw new AccessDeniedException("AccessDeniedException");
-        }
-
         board.update(boardDTO.getTitle(), boardDTO.getContent());
         return BoardDetailsResponse.fromEntity(board);
     }
@@ -96,15 +95,10 @@ public class BoardService {
     /**
      * 게시글 삭제
      */
-    public void delete(Long boardId, Member currentMember) {
-        Board board = boardRepository.findBoardWithMemberById(boardId).orElseThrow(
+    @PreAuthorize("@boardAccessHandler.check(#boardId)")
+    public void delete(@Param("boardId")Long boardId) {
+        Board board = boardRepository.findById(boardId).orElseThrow(
                 () -> new BoardNotFoundException(boardId.toString()));
-
-        // 게시글의 소유자인지 확인
-        if (!board.getMember().equals(currentMember)) {
-            throw new AccessDeniedException("AccessDeniedException");
-        }
-
-        boardRepository.deleteById(boardId);
+        boardRepository.delete(board);
     }
 }

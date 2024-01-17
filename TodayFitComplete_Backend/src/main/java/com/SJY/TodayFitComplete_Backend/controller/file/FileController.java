@@ -54,13 +54,15 @@ public class FileController {
     /**
      * 파일을 삭제합니다.
      *
+     * @param boardId 게시글 ID
      * @param fileId 삭제할 파일 ID
      * @return 삭제된 파일 ID
      */
     @DeleteMapping("/delete")
-    public ResponseEntity<Response> delete(@RequestParam("fileId") Long fileId) {
-        fileService.delete(fileId);
-        return  ResponseEntity.status(HttpStatus.OK).body(Response.success(fileId));
+    public ResponseEntity<Response> delete(@PathVariable("boardId") Long boardId,
+                                           @RequestParam("fileId") Long fileId) {
+        fileService.delete(boardId, fileId);
+        return  ResponseEntity.status(HttpStatus.OK).body(Response.success());
     }
 }
 

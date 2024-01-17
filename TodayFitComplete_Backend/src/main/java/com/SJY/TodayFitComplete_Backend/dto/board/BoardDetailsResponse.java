@@ -26,8 +26,6 @@ public class BoardDetailsResponse {
     private String writerName;
     private String createdDate;
     private String modifiedDate;
-
-    private List<CommentResponse> comments;
     private List<BoardDetailsFileResponse> files;
 
     @Builder
@@ -39,7 +37,6 @@ public class BoardDetailsResponse {
         this.writerName = writerName;
         this.createdDate = createdDate;
         this.modifiedDate = modifiedDate;
-        this.comments = comments;
         this.files = files;
     }
 
@@ -49,12 +46,9 @@ public class BoardDetailsResponse {
                 .title(board.getTitle())
                 .content(board.getContent())
                 .viewCount(board.getViewCount())
-                .writerName(board.getMember().getUsername())
+                .writerName(board.getMember().getNickname())
                 .createdDate(board.getCreatedDate())
                 .modifiedDate(board.getModifiedDate())
-                .comments(board.getComments().stream()
-                        .map(CommentResponse::fromEntity)
-                        .collect(Collectors.toList()))
                 .files(board.getFiles().stream()
                         .map(BoardDetailsFileResponse::fromEntity)
                         .collect(Collectors.toList()))

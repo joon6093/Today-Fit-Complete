@@ -1,6 +1,5 @@
 package com.SJY.TodayFitComplete_Backend.dto.comment;
 
-import com.SJY.TodayFitComplete_Backend.entity.comment.Comment;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Null;
 import lombok.Getter;
@@ -20,12 +19,5 @@ public class CommentWriteRequest {
 
     @Null
     private Long memberId;
-
-
-    public static Comment ofEntity(CommentWriteRequest dto) {
-        return Comment.builder()
-                .content(dto.getContent())
-                .build();
-    }
 }
 

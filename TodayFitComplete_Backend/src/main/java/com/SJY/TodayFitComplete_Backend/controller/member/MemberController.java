@@ -65,5 +65,17 @@ public class MemberController {
         MemberResponse updatedMember = memberService.update(memberUpdateDTO, member);
         return ResponseEntity.status(HttpStatus.OK).body(Response.success(updatedMember));
     }
+
+    /**
+     * 회원 정보를 삭제합니다.
+     *
+     * @param memberId 삭제할 사용자 ID
+     * @return 업데이트된 회원 정보
+     */
+    @DeleteMapping("/{memberId}")
+    public ResponseEntity<Response> delete(@PathVariable("memberId")Long memberId) {
+        memberService.delete(memberId);
+        return ResponseEntity.status(HttpStatus.OK).body(Response.success());
+    }
 }
 

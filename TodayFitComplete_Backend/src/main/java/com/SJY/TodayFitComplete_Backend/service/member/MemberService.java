@@ -3,13 +3,17 @@ package com.SJY.TodayFitComplete_Backend.service.member;
 import com.SJY.TodayFitComplete_Backend.config.security.token.JwtTokenUtil;
 import com.SJY.TodayFitComplete_Backend.dto.member.*;
 import com.SJY.TodayFitComplete_Backend.entity.member.Member;
+import com.SJY.TodayFitComplete_Backend.entity.member.type.RoleType;
 import com.SJY.TodayFitComplete_Backend.exception.LoginFailureException;
 import com.SJY.TodayFitComplete_Backend.exception.MemberEmailAlreadyExistsException;
+import com.SJY.TodayFitComplete_Backend.exception.MemberNotFoundException;
 import com.SJY.TodayFitComplete_Backend.exception.RegisterFailureException;
 import com.SJY.TodayFitComplete_Backend.repository.member.MemberRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.repository.query.Param;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -40,9 +44,14 @@ public class MemberService {
         String encodePwd = pwdEncoder.encode(registerDto.getPassword());
         registerDto.setPassword(encodePwd);
 
-        Member saveMember = memberRepository.save(MemberRegisterRequest.ofEntity(registerDto));
-
-        return MemberResponse.fromEntity(saveMember);
+        Member member = Member.builder()
+                .email(registerDto.getEmail())
+                .password(registerDto.getPassword())
+                .nickname(registerDto.getNickname())
+                .roles(RoleType.ROLE_USER)
+                .build();
+        memberRepository.save(member);
+        return MemberResponse.fromEntity(member);
     }
 
     /**
@@ -58,10 +67,20 @@ public class MemberService {
     /**
      * 회원 정보 변경
      */
-    public MemberResponse update(MemberUpdateRequest updateDto, Member member) {
+    public MemberResponse update(MemberUpdateRequest updateDto, Member currMember) {
+        Member member = memberRepository.findById(currMember.getId()).orElseThrow(() -> new MemberNotFoundException(currMember.getId().toString()));
         String encodePwd = pwdEncoder.encode(updateDto.getPassword());
         member.update(encodePwd, updateDto.getNickname());
         return MemberResponse.fromEntity(member);
+    }
+
+    /**
+     * 회원 정보 삭제
+     */
+    @PreAuthorize("@memberAccessHandler.check(#memberId)")
+    public void delete(@Param("memberId")Long memberId) {
+        Member member = memberRepository.findById(memberId).orElseThrow(() -> new MemberNotFoundException(memberId.toString()));
+        memberRepository.delete(member);
     }
 
     /**

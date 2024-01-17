@@ -6,6 +6,8 @@ import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 @Entity
 @Table(name = "file")
@@ -29,6 +31,7 @@ public class FileEntity extends BaseTimeEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "board_id")
+    @OnDelete(action = OnDeleteAction.CASCADE)
     public Board board;
 
     @Builder
@@ -42,5 +45,10 @@ public class FileEntity extends BaseTimeEntity {
     public void setBoard(Board board) {
         this.board = board;
         board.getFiles().add(this);
+    }
+
+    public void delBoard(Board board) {
+        this.board = null;
+        board.getFiles().remove(this);
     }
 }

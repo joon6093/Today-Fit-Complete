@@ -1,7 +1,5 @@
 package com.SJY.TodayFitComplete_Backend.dto.member;
 
-import com.SJY.TodayFitComplete_Backend.entity.member.type.RoleType;
-import com.SJY.TodayFitComplete_Backend.entity.member.Member;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
@@ -35,12 +33,4 @@ public class MemberRegisterRequest {
     @Pattern(regexp = "^[A-Za-z가-힣]+$")
     private String nickname;
 
-    public static Member ofEntity(MemberRegisterRequest dto) {
-        return Member.builder()
-                .email(dto.getEmail())
-                .password(dto.getPassword())
-                .nickname(dto.getNickname())
-                .roles(RoleType.USER)
-                .build();
-    }
 }
