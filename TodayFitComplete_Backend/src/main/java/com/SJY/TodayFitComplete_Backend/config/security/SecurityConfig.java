@@ -46,7 +46,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/api/member/register", "/api/member/login").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/member/checkPwd").authenticated()
                         .requestMatchers(HttpMethod.PUT, "/api/member/update").authenticated()
-                        .requestMatchers(HttpMethod.DELETE, "/api/member/{memberId}").authenticated()
+                        .requestMatchers(HttpMethod.DELETE, "/api/member/delete/{memberId}").authenticated()
                         .requestMatchers(HttpMethod.POST, "/api/board/write").authenticated()
                         .requestMatchers(HttpMethod.PUT, "/api/board/update/{boardId}").authenticated()
                         .requestMatchers(HttpMethod.DELETE, "/api/board/delete/{boardId}").authenticated()

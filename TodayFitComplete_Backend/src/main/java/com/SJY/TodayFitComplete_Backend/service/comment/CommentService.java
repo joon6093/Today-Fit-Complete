@@ -12,7 +12,6 @@ import com.SJY.TodayFitComplete_Backend.exception.MemberNotFoundException;
 import com.SJY.TodayFitComplete_Backend.repository.board.BoardRepository;
 import com.SJY.TodayFitComplete_Backend.repository.comment.CommentRepository;
 import com.SJY.TodayFitComplete_Backend.repository.member.MemberRepository;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -20,13 +19,14 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.repository.query.Param;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-@Transactional
+@Transactional(readOnly = true)
 public class CommentService {
 
     private final CommentRepository commentRepository;
@@ -34,7 +34,7 @@ public class CommentService {
     private final MemberRepository memberRepository;
 
     /**
-     * 모든 댓글 조회 및 페이징 처리
+     * 모든 댓글 조회
      */
     public Page<CommentResponse> getAllComments(Pageable pageable, Long boardId) {
         Page<Comment> comments = commentRepository.findCommentsWithMemberAndBoardByBoardId(boardId, pageable);
@@ -47,6 +47,7 @@ public class CommentService {
     /**
      * 댓글 작성
      */
+    @Transactional
     public CommentResponse write(Long boardId, CommentWriteRequest writeDto) {
         Board board = boardRepository.findById(boardId).orElseThrow(
                 () -> new BoardNotFoundException(boardId.toString()));
@@ -64,6 +65,7 @@ public class CommentService {
     /**
      * 댓글 수정
      */
+    @Transactional
     @PreAuthorize("@commentAccessHandler.check(#commentId)")
     public CommentResponse update(@Param("commentId")Long commentId, CommentUpdateRequest commentDto) {
         Comment comment = commentRepository.findCommentWithMemberAndBoardById(commentId).orElseThrow(
@@ -75,6 +77,7 @@ public class CommentService {
     /**
      * 댓글 삭제
      */
+    @Transactional
     @PreAuthorize("@commentAccessHandler.check(#commentId)")
     public void delete(@Param("commentId")Long commentId) {
         Comment comment = commentRepository.findCommentWithMemberAndBoardById(commentId).orElseThrow(

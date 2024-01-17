@@ -72,7 +72,7 @@ public class MemberController {
      * @param memberId 삭제할 사용자 ID
      * @return 업데이트된 회원 정보
      */
-    @DeleteMapping("/{memberId}")
+    @DeleteMapping("/delete/{memberId}")
     public ResponseEntity<Response> delete(@PathVariable("memberId")Long memberId) {
         memberService.delete(memberId);
         return ResponseEntity.status(HttpStatus.OK).body(Response.success());

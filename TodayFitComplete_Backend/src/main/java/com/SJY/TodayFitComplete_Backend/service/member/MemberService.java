@@ -9,18 +9,16 @@ import com.SJY.TodayFitComplete_Backend.exception.MemberEmailAlreadyExistsExcept
 import com.SJY.TodayFitComplete_Backend.exception.MemberNotFoundException;
 import com.SJY.TodayFitComplete_Backend.exception.RegisterFailureException;
 import com.SJY.TodayFitComplete_Backend.repository.member.MemberRepository;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.repository.query.Param;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
-@Transactional
-@Slf4j
+@Transactional(readOnly = true)
 public class MemberService {
 
     private final PasswordEncoder pwdEncoder;
@@ -37,6 +35,7 @@ public class MemberService {
     /**
      * 회원 가입
      */
+    @Transactional
     public MemberResponse register(MemberRegisterRequest registerDto) {
         isExistUserEmail(registerDto.getEmail());
         checkPassword(registerDto.getPassword(), registerDto.getPasswordCheck());
@@ -67,6 +66,7 @@ public class MemberService {
     /**
      * 회원 정보 변경
      */
+    @Transactional
     public MemberResponse update(MemberUpdateRequest updateDto, Member currMember) {
         Member member = memberRepository.findById(currMember.getId()).orElseThrow(() -> new MemberNotFoundException(currMember.getId().toString()));
         String encodePwd = pwdEncoder.encode(updateDto.getPassword());
@@ -77,6 +77,7 @@ public class MemberService {
     /**
      * 회원 정보 삭제
      */
+    @Transactional
     @PreAuthorize("@memberAccessHandler.check(#memberId)")
     public void delete(@Param("memberId")Long memberId) {
         Member member = memberRepository.findById(memberId).orElseThrow(() -> new MemberNotFoundException(memberId.toString()));

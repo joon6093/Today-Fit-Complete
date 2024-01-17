@@ -7,7 +7,6 @@ import com.SJY.TodayFitComplete_Backend.exception.BoardNotFoundException;
 import com.SJY.TodayFitComplete_Backend.exception.MemberNotFoundException;
 import com.SJY.TodayFitComplete_Backend.repository.board.BoardRepository;
 import com.SJY.TodayFitComplete_Backend.repository.member.MemberRepository;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -15,20 +14,21 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.repository.query.Param;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-@Transactional
+@Transactional(readOnly = true)
 public class BoardService {
 
     private final BoardRepository boardRepository;
     private final MemberRepository memberRepository;
 
     /**
-     * 모든 게시글 조회 및 페이징 처리
+     * 모든 게시글 조회
      */
     public Page<BoardListResponse> getAllBoards(Pageable pageable) {
         Page<Board> boards = boardRepository.findAllBoardsWithMember(pageable);
@@ -59,6 +59,7 @@ public class BoardService {
     /**
      * 게시글 등록
      */
+    @Transactional
     public BoardWriteResponse write(BoardWriteRequest boardDTO) {
         Member member = memberRepository.findById(boardDTO.getMemberId()).orElseThrow(
                 () -> new MemberNotFoundException(boardDTO.getMemberId().toString()));
@@ -84,6 +85,7 @@ public class BoardService {
     /**
      * 게시글 수정
      */
+    @Transactional
     @PreAuthorize("@boardAccessHandler.check(#boardId)")
     public BoardDetailsResponse update(@Param("boardId")Long boardId, BoardUpdateRequest boardDTO) {
         Board board = boardRepository.findBoardWithMemberById(boardId).orElseThrow(
@@ -95,6 +97,7 @@ public class BoardService {
     /**
      * 게시글 삭제
      */
+    @Transactional
     @PreAuthorize("@boardAccessHandler.check(#boardId)")
     public void delete(@Param("boardId")Long boardId) {
         Board board = boardRepository.findById(boardId).orElseThrow(

@@ -10,13 +10,13 @@ import com.SJY.TodayFitComplete_Backend.exception.FileNotFoundException;
 import com.SJY.TodayFitComplete_Backend.exception.FileUploadFailureException;
 import com.SJY.TodayFitComplete_Backend.repository.board.BoardRepository;
 import com.SJY.TodayFitComplete_Backend.repository.file.FileRepository;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.repository.query.Param;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
@@ -30,7 +30,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-@Transactional
+@Transactional(readOnly = true)
 public class FileService {
 
     private final BoardRepository boardRepository;
@@ -42,6 +42,7 @@ public class FileService {
     /**
      * 파일 업로드 및 저장
      */
+    @Transactional
     public List<FileUploadResponse> upload(Long boardId, List<MultipartFile> multipartFiles){
         Board board = boardRepository.findById(boardId).orElseThrow(
                 () -> new BoardNotFoundException(boardId.toString()));
@@ -97,6 +98,7 @@ public class FileService {
     /**
      * 파일 삭제
      */
+    @Transactional
     @PreAuthorize("@fileAccessHandler.check(#fileId)")
     public void delete(Long boardId, @Param("fileId")Long fileId){
         Board board = boardRepository.findById(boardId).orElseThrow(
