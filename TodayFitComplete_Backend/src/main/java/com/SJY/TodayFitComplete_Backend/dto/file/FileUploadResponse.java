@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 /**
- * 파일 업로드 후 응답.
+ * 파일 업로드 후 응답 DTO.
  */
 @Getter
 @Setter

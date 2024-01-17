@@ -61,7 +61,7 @@ public class Board extends BaseTimeEntity {
         this.content = content;
     }
 
-    public void setMappingMember(Member member) {
+    public void setMember(Member member) {
         this.member = member;
         member.getBoards().add(this);
     }

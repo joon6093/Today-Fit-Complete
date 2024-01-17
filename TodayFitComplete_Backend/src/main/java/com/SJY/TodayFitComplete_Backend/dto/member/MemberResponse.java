@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 /**
- * 사용자 정보 반환.
+ * 사용자 정보 응답 DTO.
  */
 @Getter
 @Setter

@@ -21,6 +21,6 @@ public interface BoardRepository extends JpaRepository<Board, Long> {
     @Query(value = "SELECT b FROM Board b JOIN FETCH b.member WHERE b.content LIKE %:content%")
     Page<Board> findBoardsByContentContaining(String content, Pageable pageable);
 
-    @Query(value = "SELECT b FROM Board b JOIN FETCH b.member WHERE b.member.username LIKE %:username%")
+    @Query(value = "SELECT b FROM Board b JOIN FETCH b.member WHERE b.member.nickname LIKE %:username%")
     Page<Board> findBoardsByAuthorUsernameContaining(String username, Pageable pageable);
 }

@@ -7,7 +7,7 @@ import lombok.Setter;
 import org.springframework.security.core.userdetails.UserDetails;
 
 /**
- * 사용자 정보 반환 및 토큰.
+ * 사용자 정보 및 토큰 정보 응답 DTO.
  */
 @Getter
 @Setter

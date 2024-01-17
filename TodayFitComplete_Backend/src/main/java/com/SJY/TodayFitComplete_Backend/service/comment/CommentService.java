@@ -1,12 +1,14 @@
 package com.SJY.TodayFitComplete_Backend.service.comment;
 
-import com.SJY.TodayFitComplete_Backend.dto.comment.CommentDto;
 import com.SJY.TodayFitComplete_Backend.dto.comment.CommentResponse;
+import com.SJY.TodayFitComplete_Backend.dto.comment.CommentUpdateRequest;
+import com.SJY.TodayFitComplete_Backend.dto.comment.CommentWriteRequest;
 import com.SJY.TodayFitComplete_Backend.entity.board.Board;
 import com.SJY.TodayFitComplete_Backend.entity.comment.Comment;
 import com.SJY.TodayFitComplete_Backend.entity.member.Member;
 import com.SJY.TodayFitComplete_Backend.exception.BoardNotFoundException;
 import com.SJY.TodayFitComplete_Backend.exception.CommentNotFoundException;
+import com.SJY.TodayFitComplete_Backend.exception.MemberNotFoundException;
 import com.SJY.TodayFitComplete_Backend.repository.board.BoardRepository;
 import com.SJY.TodayFitComplete_Backend.repository.comment.CommentRepository;
 import com.SJY.TodayFitComplete_Backend.repository.member.MemberRepository;
@@ -44,15 +46,14 @@ public class CommentService {
     /**
      * 댓글 작성
      */
-    public CommentResponse write(Long boardId, Member member, CommentDto writeDto) {
+    public CommentResponse write(Long boardId, CommentWriteRequest writeDto) {
         Board board = boardRepository.findById(boardId).orElseThrow(
                 () -> new BoardNotFoundException(boardId.toString()));
-        Member commentWriter = memberRepository.findById(member.getId()).orElseThrow(
-                () -> new BoardNotFoundException(boardId.toString()));
-        Comment comment = CommentDto.ofEntity(writeDto);
+        Member member = memberRepository.findById(writeDto.getMemberId()).orElseThrow(
+                () -> new MemberNotFoundException(writeDto.getMemberId().toString()));
+        Comment comment = CommentWriteRequest.ofEntity(writeDto);
         comment.setBoard(board);
-        comment.setMember(commentWriter);
-
+        comment.setMember(member);
         Comment saveComment = commentRepository.save(comment);
         return CommentResponse.fromEntity(saveComment);
     }
@@ -60,7 +61,7 @@ public class CommentService {
     /**
      * 댓글 수정
      */
-    public CommentResponse update(Long commentId, CommentDto commentDto, Member currentMember) {
+    public CommentResponse update(Long commentId, CommentUpdateRequest commentDto, Member currentMember) {
         Comment comment = commentRepository.findCommentWithMemberAndBoardById(commentId).orElseThrow(
                 () -> new CommentNotFoundException(commentId.toString()));
 

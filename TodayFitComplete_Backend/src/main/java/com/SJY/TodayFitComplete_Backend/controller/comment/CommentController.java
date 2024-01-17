@@ -1,11 +1,13 @@
 package com.SJY.TodayFitComplete_Backend.controller.comment;
 
-
-import com.SJY.TodayFitComplete_Backend.dto.comment.CommentDto;
+import com.SJY.TodayFitComplete_Backend.aop.AssignMemberId;
 import com.SJY.TodayFitComplete_Backend.dto.comment.CommentResponse;
+import com.SJY.TodayFitComplete_Backend.dto.comment.CommentUpdateRequest;
+import com.SJY.TodayFitComplete_Backend.dto.comment.CommentWriteRequest;
 import com.SJY.TodayFitComplete_Backend.dto.response.Response;
 import com.SJY.TodayFitComplete_Backend.entity.member.Member;
 import com.SJY.TodayFitComplete_Backend.service.comment.CommentService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -41,17 +43,16 @@ public class CommentController {
     /**
      * 새로운 댓글을 작성합니다.
      *
-     * @param member 인증된 사용자 정보
      * @param boardId 게시글 ID
      * @param commentDto 댓글 작성 데이터
      * @return 생성된 댓글 정보
      */
     @PostMapping("/write")
+    @AssignMemberId
     public ResponseEntity<Response> write(
-            @AuthenticationPrincipal Member member,
             @PathVariable("boardId") Long boardId,
-            @RequestBody CommentDto commentDto) {
-        CommentResponse saveCommentDTO = commentService.write(boardId, member, commentDto);
+            @Valid @RequestBody CommentWriteRequest commentDto) {
+        CommentResponse saveCommentDTO = commentService.write(boardId, commentDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(Response.success(saveCommentDTO));
     }
 
@@ -67,7 +68,7 @@ public class CommentController {
     public ResponseEntity<Response> update(
             @AuthenticationPrincipal Member member,
             @PathVariable("boardId") Long commentId,
-            @RequestBody CommentDto commentDto) {
+            @Valid @RequestBody CommentUpdateRequest commentDto) {
         CommentResponse updateCommentDTO = commentService.update(commentId, commentDto, member);
         return ResponseEntity.status(HttpStatus.OK).body(Response.success(updateCommentDTO));
     }

@@ -5,7 +5,6 @@ import com.SJY.TodayFitComplete_Backend.dto.member.*;
 import com.SJY.TodayFitComplete_Backend.entity.member.Member;
 import com.SJY.TodayFitComplete_Backend.exception.LoginFailureException;
 import com.SJY.TodayFitComplete_Backend.exception.MemberEmailAlreadyExistsException;
-import com.SJY.TodayFitComplete_Backend.exception.MemberNotFoundException;
 import com.SJY.TodayFitComplete_Backend.exception.RegisterFailureException;
 import com.SJY.TodayFitComplete_Backend.repository.member.MemberRepository;
 import jakarta.transaction.Transactional;
@@ -34,14 +33,14 @@ public class MemberService {
     /**
      * 회원 가입
      */
-    public MemberResponse register(MemberRegisterDto registerDto) {
+    public MemberResponse register(MemberRegisterRequest registerDto) {
         isExistUserEmail(registerDto.getEmail());
         checkPassword(registerDto.getPassword(), registerDto.getPasswordCheck());
 
         String encodePwd = pwdEncoder.encode(registerDto.getPassword());
         registerDto.setPassword(encodePwd);
 
-        Member saveMember = memberRepository.save(MemberRegisterDto.ofEntity(registerDto));
+        Member saveMember = memberRepository.save(MemberRegisterRequest.ofEntity(registerDto));
 
         return MemberResponse.fromEntity(saveMember);
     }
@@ -49,7 +48,7 @@ public class MemberService {
     /**
      * 로그인
      */
-    public MemberTokenResponse login(MemberLoginDto loginDto) {
+    public MemberTokenResponse login(MemberLoginRequest loginDto) {
         Member member = memberRepository.findByEmail(loginDto.getEmail()).orElseThrow(() -> new LoginFailureException());
         checkEncodePassword(loginDto.getPassword(), member.getPassword());
         String token = jwtTokenUtil.generateToken(member);
@@ -57,23 +56,12 @@ public class MemberService {
     }
 
     /**
-     * 회원 정보 체크
-     */
-    public MemberResponse check(Member currentMember, String password) {
-        Member member = memberRepository.findById(currentMember.getId()).orElseThrow(() -> new MemberNotFoundException(currentMember.getEmail()));
-        checkEncodePassword(password, member.getPassword());
-        return MemberResponse.fromEntity(member);
-    }
-
-    /**
      * 회원 정보 변경
      */
-    public MemberResponse update(Member member, MemberUpdateDto updateDto) {
+    public MemberResponse update(MemberUpdateRequest updateDto, Member member) {
         String encodePwd = pwdEncoder.encode(updateDto.getPassword());
-        Member updateMember =  memberRepository.findByEmail(member.getEmail()).orElseThrow(
-                () -> new MemberNotFoundException(member.getEmail()));
-        updateMember.update(encodePwd, updateDto.getUsername());
-        return MemberResponse.fromEntity(updateMember);
+        member.update(encodePwd, updateDto.getNickname());
+        return MemberResponse.fromEntity(member);
     }
 
     /**

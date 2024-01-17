@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 /**
- * 게시글 작성 응답 정보를 위한 DTO.
+ * 게시글 작성 응답 DTO.
  */
 @Getter
 @Setter
@@ -29,12 +29,12 @@ public class BoardWriteResponse {
         this.createdDate = createdDate;
     }
 
-    public static BoardWriteResponse fromEntity(Board board, String writerName) {
+    public static BoardWriteResponse fromEntity(Board board) {
         return BoardWriteResponse.builder()
                 .boardId(board.getId())
                 .title(board.getTitle())
                 .content(board.getContent())
-                .writerName(writerName)
+                .writerName(board.getMember().getNickname())
                 .createdDate(board.getCreatedDate())
                 .build();
     }

@@ -58,14 +58,13 @@ public class BoardService {
     /**
      * 게시글 등록
      */
-    public BoardWriteResponse write(BoardWriteDto boardDTO, Member member) {
-
-        Board board = BoardWriteDto.ofEntity(boardDTO);
-        Member writerMember = memberRepository.findByEmail(member.getEmail()).orElseThrow(
-                () -> new MemberNotFoundException(member.getEmail()));
-        board.setMappingMember(writerMember);
+    public BoardWriteResponse write(BoardWriteRequest boardDTO) {
+        Board board = BoardWriteRequest.ofEntity(boardDTO);
+        Member member = memberRepository.findById(boardDTO.getMemberId()).orElseThrow(
+                () -> new MemberNotFoundException(boardDTO.getMemberId().toString()));
+        board.setMember(member);
         Board saveBoard = boardRepository.save(board);
-        return BoardWriteResponse.fromEntity(saveBoard, writerMember.getUsername());
+        return BoardWriteResponse.fromEntity(saveBoard);
     }
 
     /**
@@ -81,7 +80,7 @@ public class BoardService {
     /**
      * 게시글 수정
      */
-    public BoardDetailsResponse update(Long boardId, BoardUpdateDto boardDTO, Member currentMember) {
+    public BoardDetailsResponse update(Long boardId, BoardUpdateRequest boardDTO, Member currentMember) {
         Board board = boardRepository.findBoardWithMemberById(boardId).orElseThrow(
                 () -> new BoardNotFoundException(boardId.toString()));
 

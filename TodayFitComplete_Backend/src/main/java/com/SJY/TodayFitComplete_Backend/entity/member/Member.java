@@ -33,7 +33,7 @@ public class Member extends BaseTimeEntity implements UserDetails {
     private String password;
 
     @Column(nullable = false, length = 20)
-    private String username;
+    private String nickname;
 
     @Enumerated(EnumType.STRING)
     private RoleType roles;
@@ -45,16 +45,16 @@ public class Member extends BaseTimeEntity implements UserDetails {
     public List<Comment> comments = new ArrayList<>();
 
     @Builder
-    public Member(String email, String password, String username, RoleType roles) {
+    public Member(String email, String password, String nickname, RoleType roles) {
         this.email = email;
         this.password = password;
-        this.username = username;
+        this.nickname = nickname;
         this.roles = roles;
     }
 
     public void update(String password, String username) {
         this.password = password;
-        this.username = username;
+        this.nickname = username;
     }
 
     @Override

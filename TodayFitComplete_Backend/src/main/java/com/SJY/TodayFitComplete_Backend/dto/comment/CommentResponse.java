@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 /**
- * 댓글 등록 및 수정 응답.
+ * 댓글 등록 및 수정 응답 DTO.
  */
 @Getter
 @Setter

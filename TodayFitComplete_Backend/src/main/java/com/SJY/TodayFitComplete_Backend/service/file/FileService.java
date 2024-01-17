@@ -63,7 +63,7 @@ public class FileService {
                             .fileType(multipartFile.getContentType())
                             .build();
 
-                    saveFile.setMappingBoard(board);
+                    saveFile.setBoard(board);
                     fileEntitys.add(fileRepository.save(saveFile));
 
             }

@@ -1,6 +1,7 @@
 package com.SJY.TodayFitComplete_Backend.dto.comment;
 
 import com.SJY.TodayFitComplete_Backend.entity.comment.Comment;
+import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -11,10 +12,12 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-public class CommentDto {
+public class CommentUpdateRequest {
+
+    @NotBlank
     private String content;
 
-    public static Comment ofEntity(CommentDto dto) {
+    public static Comment ofEntity(CommentUpdateRequest dto) {
         return Comment.builder()
                 .content(dto.getContent())
                 .build();

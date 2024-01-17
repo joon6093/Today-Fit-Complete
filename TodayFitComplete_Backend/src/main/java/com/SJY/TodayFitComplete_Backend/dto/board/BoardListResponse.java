@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 /**
- * 게시글 목록 응답을 위한 DTO. 양방향 관계로 인해 JSON 직렬화 루프를 피하기 위함.
+ * 게시글 목록 응답 DTO.
  */
 @Getter
 @Setter

@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 /**
- * 게시글 상세 정보에 포함될 파일 정보.
+ * 게시글 상세 정보 조회 응답 DTO.
  */
 @Getter
 @Setter

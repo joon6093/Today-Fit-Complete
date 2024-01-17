@@ -1,6 +1,8 @@
 package com.SJY.TodayFitComplete_Backend.dto.board;
 
 import com.SJY.TodayFitComplete_Backend.entity.board.Board;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Null;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -11,11 +13,18 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-public class BoardWriteDto {
+public class BoardWriteRequest {
+
+    @NotBlank
     private String title;
+
+    @NotBlank
     private String content;
 
-    public static Board ofEntity(BoardWriteDto dto) {
+    @Null
+    private Long memberId;
+
+    public static Board ofEntity(BoardWriteRequest dto) {
         return Board.builder()
                 .title(dto.getTitle())
                 .content(dto.getContent())

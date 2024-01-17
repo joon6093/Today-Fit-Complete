@@ -1,10 +1,11 @@
 package com.SJY.TodayFitComplete_Backend.controller.board;
 
-
+import com.SJY.TodayFitComplete_Backend.aop.AssignMemberId;
 import com.SJY.TodayFitComplete_Backend.dto.board.*;
 import com.SJY.TodayFitComplete_Backend.dto.response.Response;
 import com.SJY.TodayFitComplete_Backend.entity.member.Member;
 import com.SJY.TodayFitComplete_Backend.service.board.BoardService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -65,14 +66,13 @@ public class BoardController {
      * 새로운 게시글을 작성합니다.
      *
      * @param boardDTO 게시글 작성 데이터
-     * @param member 인증된 사용자 정보
      * @return 생성된 게시글 정보
      */
     @PostMapping("/write")
+    @AssignMemberId
     public ResponseEntity<Response> write(
-            @RequestBody BoardWriteDto boardDTO,
-            @AuthenticationPrincipal Member member) {
-        BoardWriteResponse saveBoardDTO = boardService.write(boardDTO, member);
+            @Valid @RequestBody BoardWriteRequest boardDTO) {
+        BoardWriteResponse saveBoardDTO = boardService.write(boardDTO);
         return ResponseEntity.status(HttpStatus.CREATED).body(Response.success(saveBoardDTO));
     }
 
@@ -99,7 +99,7 @@ public class BoardController {
     @PatchMapping("/update/{boardId}")
     public ResponseEntity<Response> update(
             @PathVariable("boardId") Long boardId,
-            @RequestBody BoardUpdateDto boardDTO,
+            @Valid @RequestBody BoardUpdateRequest boardDTO,
             @AuthenticationPrincipal Member member) {
         BoardDetailsResponse updateBoardDTO = boardService.update(boardId, boardDTO, member);
         return ResponseEntity.status(HttpStatus.OK).body(Response.success(updateBoardDTO));
