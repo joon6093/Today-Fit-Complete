@@ -10,11 +10,11 @@ import org.springframework.data.repository.query.Param;
 import java.util.Optional;
 
 public interface BoardRepository extends JpaRepository<Board, Long> {
-    @Query(value = "SELECT b FROM Board b JOIN FETCH b.member WHERE b.id = :boardId")
-    Optional<Board> findBoardWithMemberById(@Param("boardId")Long boardId);
-
     @Query(value = "SELECT b FROM Board b JOIN FETCH b.member")
     Page<Board> findAllBoardsWithMember(Pageable pageable);
+
+    @Query(value = "SELECT b FROM Board b JOIN FETCH b.member LEFT JOIN FETCH b.files WHERE b.id = :boardId")
+    Optional<Board> findBoardWithMemberAndFilesById(@Param("boardId") Long boardId);
 
     @Query(value = "SELECT b FROM Board b JOIN FETCH b.member WHERE b.title LIKE %:title%")
     Page<Board> findBoardsByTitleContaining(@Param("title")String title, Pageable pageable);

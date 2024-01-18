@@ -31,7 +31,7 @@ public class BoardController {
      */
     @GetMapping("/list")
     public ResponseEntity<Response> boardList(
-            @PageableDefault(size = 10, sort = "id", direction = Sort.Direction.DESC) Pageable pageable) {
+            @PageableDefault(sort = "id", direction = Sort.Direction.DESC) Pageable pageable) {
         Page<BoardListResponse> listDTO = boardService.getAllBoards(pageable);
         return ResponseEntity.status(HttpStatus.OK).body(Response.success(listDTO));
     }
@@ -47,16 +47,11 @@ public class BoardController {
      */
     @GetMapping("/search")
     public ResponseEntity<Response> search(
-            @PageableDefault(size = 5, sort = "id", direction = Sort.Direction.DESC) Pageable pageable,
-            @RequestParam String title,
-            @RequestParam String content,
-            @RequestParam String writerName) {
-        SearchData searchData = SearchData.builder()
-                .title(title)
-                .content(content)
-                .writerName(writerName)
-                .build();
-        Page<BoardListResponse> searchBoard = boardService.search(searchData, pageable);
+            @PageableDefault(sort = "id", direction = Sort.Direction.DESC) Pageable pageable,
+            @RequestParam(name = "title", required = false) String title,
+            @RequestParam(name = "content", required = false) String content,
+            @RequestParam(name = "writerName", required = false) String writerName) {
+        Page<BoardListResponse> searchBoard = boardService.search(title, content, writerName, pageable);
         return ResponseEntity.status(HttpStatus.OK).body(Response.success(searchBoard));
     }
 

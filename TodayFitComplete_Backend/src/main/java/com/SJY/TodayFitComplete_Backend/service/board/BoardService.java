@@ -39,16 +39,21 @@ public class BoardService {
     }
 
     /**
-     * 게시글 검색 및 페이징 처리
+     * 게시글 검색
      */
-    public Page<BoardListResponse> search(SearchData searchData, Pageable pageable) {
-        Page<Board> result = null;
-        if (!searchData.getTitle().isEmpty()) {
-            result = boardRepository.findBoardsByTitleContaining(searchData.getTitle(), pageable);
-        } else if (!searchData.getContent().isEmpty()) {
-            result = boardRepository.findBoardsByContentContaining(searchData.getContent(), pageable);
-        } else if (!searchData.getWriterName().isEmpty()) {
-            result = boardRepository.findBoardsByAuthorUsernameContaining(searchData.getWriterName(), pageable);
+    public Page<BoardListResponse> search(String title, String content, String writerName, Pageable pageable) {
+        boolean isTitleValid = title != null && !title.trim().isEmpty();
+        boolean isContentValid = content != null && !content.trim().isEmpty();
+        boolean isWriterNameValid = writerName != null && !writerName.trim().isEmpty();
+        Page<Board> result;
+        if (isTitleValid) {
+            result = boardRepository.findBoardsByTitleContaining(title, pageable);
+        } else if (isContentValid) {
+            result = boardRepository.findBoardsByContentContaining(content, pageable);
+        } else if (isWriterNameValid) {
+            result = boardRepository.findBoardsByAuthorUsernameContaining(writerName, pageable);
+        } else {
+            result = boardRepository.findAll(pageable);
         }
         List<BoardListResponse> list = result.getContent().stream()
                 .map(BoardListResponse::fromEntity)
@@ -76,7 +81,7 @@ public class BoardService {
      * 게시글 상세보기
      */
     public BoardDetailsResponse detail(Long boardId) {
-       Board board = boardRepository.findBoardWithMemberById(boardId).orElseThrow(
+       Board board = boardRepository.findBoardWithMemberAndFilesById(boardId).orElseThrow(
                () -> new BoardNotFoundException(boardId.toString()));
         board.upViewCount();
        return BoardDetailsResponse.fromEntity(board);
@@ -88,7 +93,7 @@ public class BoardService {
     @Transactional
     @PreAuthorize("@boardAccessHandler.check(#boardId)")
     public BoardDetailsResponse update(@Param("boardId")Long boardId, BoardUpdateRequest boardDTO) {
-        Board board = boardRepository.findBoardWithMemberById(boardId).orElseThrow(
+        Board board = boardRepository.findById(boardId).orElseThrow(
                 () -> new BoardNotFoundException(boardId.toString()));
         board.update(boardDTO.getTitle(), boardDTO.getContent());
         return BoardDetailsResponse.fromEntity(board);

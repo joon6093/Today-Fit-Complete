@@ -12,6 +12,10 @@ spring:
   messages:
     basename: i18n/exception
     fallback-to-system-locale: false
+  jpa:
+    properties:
+      hibernate:
+        default_batch_fetch_size: 10
 ---
 spring:
   config:

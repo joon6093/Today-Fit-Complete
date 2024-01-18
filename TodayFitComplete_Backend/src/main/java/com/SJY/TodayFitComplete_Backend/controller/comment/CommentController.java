@@ -33,7 +33,7 @@ public class CommentController {
     @GetMapping("/list")
     public ResponseEntity<Response> commentList(
             @PathVariable("boardId") Long boardId,
-            @PageableDefault(size = 5, sort = "id", direction = Sort.Direction.DESC) Pageable pageable) {
+            @PageableDefault(sort = "id", direction = Sort.Direction.DESC) Pageable pageable) {
         Page<CommentResponse> commentList = commentService.getAllComments(pageable, boardId);
         return ResponseEntity.status(HttpStatus.OK).body(Response.success(commentList));
     }
