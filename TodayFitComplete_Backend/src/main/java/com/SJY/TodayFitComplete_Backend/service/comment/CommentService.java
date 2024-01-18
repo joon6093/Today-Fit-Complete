@@ -37,7 +37,7 @@ public class CommentService {
      * 모든 댓글 조회
      */
     public Page<CommentResponse> getAllComments(Pageable pageable, Long boardId) {
-        Page<Comment> comments = commentRepository.findCommentsWithMemberAndBoardByBoardId(boardId, pageable);
+        Page<Comment> comments = commentRepository.findAllWithMemberAndBoardByBoardId(boardId, pageable);
         List<CommentResponse> commentList = comments.getContent().stream()
                 .map(CommentResponse::fromEntity)
                 .collect(Collectors.toList());
@@ -68,7 +68,7 @@ public class CommentService {
     @Transactional
     @PreAuthorize("@commentAccessHandler.check(#commentId)")
     public CommentResponse update(@Param("commentId")Long commentId, CommentUpdateRequest commentDto) {
-        Comment comment = commentRepository.findCommentWithMemberAndBoardById(commentId).orElseThrow(
+        Comment comment = commentRepository.findByIdWithMemberAndBoard(commentId).orElseThrow(
                 () -> new CommentNotFoundException(commentId.toString()));
         comment.update(commentDto.getContent());
         return CommentResponse.fromEntity(comment);
@@ -80,7 +80,7 @@ public class CommentService {
     @Transactional
     @PreAuthorize("@commentAccessHandler.check(#commentId)")
     public void delete(@Param("commentId")Long commentId) {
-        Comment comment = commentRepository.findCommentWithMemberAndBoardById(commentId).orElseThrow(
+        Comment comment = commentRepository.findByIdWithMemberAndBoard(commentId).orElseThrow(
                 () -> new CommentNotFoundException(commentId.toString()));
         commentRepository.delete(comment);
     }

@@ -18,7 +18,8 @@ public enum ExceptionType {
     FILE_NOT_FOUND_EXCEPTION("fileNotFoundException.code", "fileNotFoundException.msg"),
     COMMENT_NOT_FOUND_EXCEPTION("commentNotFoundException.code", "commentNotFoundException.msg"),
     FILE_UPLOAD_FAILURE_EXCEPTION("fileUploadFailureException.code", "fileUploadFailureException.msg"),
-    FILE_DOWNLOAD_FAILURE_EXCEPTION("fileDownloadFailureException.code", "fileDownloadFailureException.msg");
+    FILE_DOWNLOAD_FAILURE_EXCEPTION("fileDownloadFailureException.code", "fileDownloadFailureException.msg"),
+    FILE_DELETE_FAILURE_EXCEPTION("fileDeleteFailureException.code", "fileDeleteFailureException.msg");
 
     private final String code;
     private final String message;

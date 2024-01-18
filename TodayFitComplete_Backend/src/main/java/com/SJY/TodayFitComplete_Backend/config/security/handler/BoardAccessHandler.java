@@ -23,7 +23,7 @@ public class BoardAccessHandler extends AccessHandler {
     @Override
     protected boolean isResourceOwner(Long id) {
         return boardRepository.findById(id)
-                .map(post -> post.getMember())
+                .map(board -> board.getMember())
                 .map(member -> member.getId())
                 .filter(memberId -> memberId.equals(AuthHandler.extractMemberId()))
                 .isPresent();

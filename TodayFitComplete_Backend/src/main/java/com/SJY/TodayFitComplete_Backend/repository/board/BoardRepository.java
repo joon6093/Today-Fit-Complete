@@ -11,17 +11,20 @@ import java.util.Optional;
 
 public interface BoardRepository extends JpaRepository<Board, Long> {
     @Query(value = "SELECT b FROM Board b JOIN FETCH b.member")
-    Page<Board> findAllBoardsWithMember(Pageable pageable);
+    Page<Board> findAllWithMembers(Pageable pageable);
 
     @Query(value = "SELECT b FROM Board b JOIN FETCH b.member LEFT JOIN FETCH b.files WHERE b.id = :boardId")
-    Optional<Board> findBoardWithMemberAndFilesById(@Param("boardId") Long boardId);
+    Optional<Board> findByIdWithMemberAndFiles(@Param("boardId") Long boardId);
+
+    @Query("SELECT b FROM Board b LEFT JOIN FETCH b.files WHERE b.id = :boardId")
+    Optional<Board> findByIdWithFiles(@Param("boardId") Long boardId);
 
     @Query(value = "SELECT b FROM Board b JOIN FETCH b.member WHERE b.title LIKE %:title%")
-    Page<Board> findBoardsByTitleContaining(@Param("title")String title, Pageable pageable);
+    Page<Board> findAllByTitleWithMembers(@Param("title")String title, Pageable pageable);
 
     @Query(value = "SELECT b FROM Board b JOIN FETCH b.member WHERE b.content LIKE %:content%")
-    Page<Board> findBoardsByContentContaining(@Param("content")String content, Pageable pageable);
+    Page<Board> findAllByContentWithMembers(@Param("content")String content, Pageable pageable);
 
     @Query(value = "SELECT b FROM Board b JOIN FETCH b.member WHERE b.member.nickname LIKE %:username%")
-    Page<Board> findBoardsByAuthorUsernameContaining(@Param("username")String username, Pageable pageable);
+    Page<Board> findAllByUsernameWithMembers(@Param("username")String username, Pageable pageable);
 }

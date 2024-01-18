@@ -117,4 +117,12 @@ public class GlobalExceptionHandler {
                 .status(HttpStatus.NOT_FOUND)
                 .body(responseHandler.getFailureResponse(FILE_DOWNLOAD_FAILURE_EXCEPTION));
     }
+
+    @ExceptionHandler(FileDeleteFailureException.class)
+    public ResponseEntity<Response> fileDeleteFailureException(FileDeleteFailureException e) {
+        log.info("e = {}", e.getMessage());
+        return ResponseEntity
+                .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(responseHandler.getFailureResponse(FILE_DELETE_FAILURE_EXCEPTION));
+    }
 }

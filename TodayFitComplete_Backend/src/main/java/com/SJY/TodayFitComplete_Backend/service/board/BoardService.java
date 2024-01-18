@@ -7,6 +7,7 @@ import com.SJY.TodayFitComplete_Backend.exception.BoardNotFoundException;
 import com.SJY.TodayFitComplete_Backend.exception.MemberNotFoundException;
 import com.SJY.TodayFitComplete_Backend.repository.board.BoardRepository;
 import com.SJY.TodayFitComplete_Backend.repository.member.MemberRepository;
+import com.SJY.TodayFitComplete_Backend.service.file.FileService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -26,12 +27,13 @@ public class BoardService {
 
     private final BoardRepository boardRepository;
     private final MemberRepository memberRepository;
+    private final FileService fileService;
 
     /**
      * 모든 게시글 조회
      */
     public Page<BoardListResponse> getAllBoards(Pageable pageable) {
-        Page<Board> boards = boardRepository.findAllBoardsWithMember(pageable);
+        Page<Board> boards = boardRepository.findAllWithMembers(pageable);
         List<BoardListResponse> list = boards.getContent().stream()
                 .map(BoardListResponse::fromEntity)
                 .collect(Collectors.toList());
@@ -47,11 +49,11 @@ public class BoardService {
         boolean isWriterNameValid = writerName != null && !writerName.trim().isEmpty();
         Page<Board> result;
         if (isTitleValid) {
-            result = boardRepository.findBoardsByTitleContaining(title, pageable);
+            result = boardRepository.findAllByTitleWithMembers(title, pageable);
         } else if (isContentValid) {
-            result = boardRepository.findBoardsByContentContaining(content, pageable);
+            result = boardRepository.findAllByContentWithMembers(content, pageable);
         } else if (isWriterNameValid) {
-            result = boardRepository.findBoardsByAuthorUsernameContaining(writerName, pageable);
+            result = boardRepository.findAllByUsernameWithMembers(writerName, pageable);
         } else {
             result = boardRepository.findAll(pageable);
         }
@@ -81,7 +83,7 @@ public class BoardService {
      * 게시글 상세보기
      */
     public BoardDetailsResponse detail(Long boardId) {
-       Board board = boardRepository.findBoardWithMemberAndFilesById(boardId).orElseThrow(
+       Board board = boardRepository.findByIdWithMemberAndFiles(boardId).orElseThrow(
                () -> new BoardNotFoundException(boardId.toString()));
         board.upViewCount();
        return BoardDetailsResponse.fromEntity(board);
@@ -105,8 +107,9 @@ public class BoardService {
     @Transactional
     @PreAuthorize("@boardAccessHandler.check(#boardId)")
     public void delete(@Param("boardId")Long boardId) {
-        Board board = boardRepository.findById(boardId).orElseThrow(
+        Board board = boardRepository.findByIdWithFiles(boardId).orElseThrow(
                 () -> new BoardNotFoundException(boardId.toString()));
+        board.getFiles().forEach(file -> fileService.deleteLocalFile(file));
         boardRepository.delete(board);
     }
 }

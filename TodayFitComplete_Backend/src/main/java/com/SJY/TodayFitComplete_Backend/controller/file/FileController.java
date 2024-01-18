@@ -47,7 +47,7 @@ public class FileController {
         FileDownloadResponse downloadDto = fileService.download(fileId);
         return ResponseEntity.status(HttpStatus.OK)
                 .contentType(MediaType.parseMediaType(downloadDto.getFileType()))
-                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; fileName=\"" + downloadDto.getFilename() + "\"")
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + downloadDto.getFilename() + "\"")
                 .body(new ByteArrayResource(downloadDto.getContent()));
     }
 
