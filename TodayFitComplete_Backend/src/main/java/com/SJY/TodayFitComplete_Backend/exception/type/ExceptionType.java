@@ -9,7 +9,7 @@ public enum ExceptionType {
     ACCESS_DENIED_EXCEPTION("accessDeniedException.code", "accessDeniedException.msg"),
     EXPIRED_JWT_EXCEPTION("expiredJwtException.code", "expiredJwtException.msg"),
     JWT_TOKEN_FAILURE_EXCEPTION("jwtTokenFailureException.code", "jwtTokenFailureException.msg"),
-    BIND_EXCEPTION("bindException.code", "bindException.msg"),
+    METHOD_ARGUMENT_NOT_VALID_EXCEPTION("methodArgumentNotValidException.code", "methodArgumentNotValidException.msg"),
     REGISTER_FAILURE_EXCEPTION("registerFailureException.code", "registerFailureException.msg"),
     LOGIN_FAILURE_EXCEPTION("loginFailureException.code", "loginFailureException.msg"),
     MEMBER_EMAIL_ALREADY_EXISTS_EXCEPTION("memberEmailAlreadyExistsException.code", "memberEmailAlreadyExistsException.msg"),

@@ -14,10 +14,10 @@ import lombok.Setter;
 @NoArgsConstructor
 public class BoardWriteRequest {
 
-    @NotBlank
+    @NotBlank(message = "{boardRequest.title.notBlank}")
     private String title;
 
-    @NotBlank
+    @NotBlank(message = "{boardRequest.content.notBlank}")
     private String content;
 
     @Null

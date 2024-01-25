@@ -13,7 +13,7 @@ import lombok.Setter;
 @NoArgsConstructor
 public class CommentUpdateRequest {
 
-    @NotBlank
+    @NotBlank(message = "{commentRequest.content.notBlank}")
     private String content;
 }
 

@@ -12,12 +12,12 @@ import lombok.*;
 @Setter
 public class MemberUpdateRequest {
 
-    @NotBlank
-    @Pattern(regexp = "^(?=.*[A-Za-z])(?=.*\\d)(?=.*[@$!%*#?&])[A-Za-z\\d@$!%*#?&]{8,}$")
+    @NotBlank(message = "{memberRequest.password.notBlank}")
+    @Pattern(regexp = "^(?=.*[A-Za-z])(?=.*\\d)(?=.*[@$!%*#?&])[A-Za-z\\d@$!%*#?&]{8,}$", message = "{memberRegisterRequest.password.pattern}")
     private String password;
 
-    @NotBlank
-    @Size(min=2)
-    @Pattern(regexp = "^[A-Za-z가-힣]+$")
+    @NotBlank(message = "{memberRequest.nickname.notBlank}")
+    @Size(min=2, message = "{memberRequest.nickname.size}")
+    @Pattern(regexp = "^[A-Za-z가-힣]+$", message = "{memberRegisterRequest.nickname.pattern}")
     private String nickname;
 }

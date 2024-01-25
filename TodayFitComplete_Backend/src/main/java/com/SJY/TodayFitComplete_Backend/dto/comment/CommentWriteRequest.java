@@ -14,7 +14,7 @@ import lombok.Setter;
 @NoArgsConstructor
 public class CommentWriteRequest {
 
-    @NotBlank
+    @NotBlank(message = "{commentRequest.content.notBlank}")
     private String content;
 
     @Null

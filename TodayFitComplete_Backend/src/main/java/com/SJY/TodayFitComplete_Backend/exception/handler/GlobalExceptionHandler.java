@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
 import java.io.FileNotFoundException;
-import java.net.BindException;
+import java.util.Objects;
 
 import static com.SJY.TodayFitComplete_Backend.exception.type.ExceptionType.*;
 
@@ -39,18 +39,11 @@ public class GlobalExceptionHandler {
                 .body(responseHandler.getFailureResponse(ACCESS_DENIED_EXCEPTION));
     }
 
-    @ExceptionHandler(BindException.class)
-    public ResponseEntity<Response> bindException(BindException e) {
-        return ResponseEntity
-                .status(HttpStatus.BAD_REQUEST)
-                .body(responseHandler.getFailureResponse(BIND_EXCEPTION, e.getMessage()));
-    }
-
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Response> methodArgumentNotValidException(MethodArgumentNotValidException e) {
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
-                .body(responseHandler.getFailureResponse(BIND_EXCEPTION, e.getMessage()));
+                .body(responseHandler.getFailureResponse(METHOD_ARGUMENT_NOT_VALID_EXCEPTION, Objects.requireNonNull(e.getBindingResult().getFieldError()).getDefaultMessage()));
     }
 
     @ExceptionHandler(RegisterFailureException.class)

@@ -10,7 +10,7 @@ spring:
       max-file-size: 10MB
       max-request-size: 10MB
   messages:
-    basename: i18n/exception
+    basename: i18n/exception, i18n/validation
     fallback-to-system-locale: false
   jpa:
     properties:

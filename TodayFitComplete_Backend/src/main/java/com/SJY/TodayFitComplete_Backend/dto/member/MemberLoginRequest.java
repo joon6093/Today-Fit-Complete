@@ -14,10 +14,10 @@ import lombok.Setter;
 @NoArgsConstructor
 public class MemberLoginRequest {
 
-    @Email
-    @NotBlank
+    @Email(message = "{memberRequest.email.email}")
+    @NotBlank(message = "{memberRequest.email.notBlank}")
     private String email;
 
-    @NotBlank
+    @NotBlank(message = "{memberRequest.password.notBlank}")
     private String password;
 }

@@ -13,10 +13,10 @@ import lombok.Setter;
 @NoArgsConstructor
 public class BoardUpdateRequest {
 
-    @NotBlank
+    @NotBlank(message = "{boardRequest.title.notBlank}")
     private String title;
 
-    @NotBlank
+    @NotBlank(message = "{boardRequest.content.notBlank}")
     private String content;
 
 }
